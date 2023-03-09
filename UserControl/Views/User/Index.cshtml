@@ -1,0 +1,70 @@
+﻿@model IEnumerable<DisplayUserModel>
+@inject AppDbContext _context
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                User Picture
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsAdmin)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <img src='@Url.Action("LoadUserPicture", new { id = item.Id })' class="img-thumbnail img-user" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            @if (item.IsAdmin)
+                {
+                    <td>
+                        &#x2713;
+                    </td>
+                }
+                else
+                {
+                    <td>
+                
+                    </td>
+                }
+            @if (User.IsInRole(_context.AdminRole.Name))
+                {
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    </td>
+                }
+
+        </tr>
+}
+    </tbody>
+</table>
