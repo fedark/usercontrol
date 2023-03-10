@@ -13,43 +13,26 @@ using UserControl.Models;
 namespace UserControl.Controllers
 {
     [Authorize]
-    public class UserController : Controller
+    public partial class UserController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment hostEnvironment_;
+        private readonly IWebHostEnvironment webHostEnvironment_;
 
-        public UserController(AppDbContext context, IWebHostEnvironment hostEnvironment)
+        public UserController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
-            hostEnvironment_ = hostEnvironment;
+            webHostEnvironment_ = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
-            return View(await ToDisplayUsersAsync(users));
-        }
-
-        public async Task<IActionResult> LoadUserPicture(string? id)
-        {
-            var user = await GetUserAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (userProfile is null)
-            {
-                return NotFound();
-            }
-
-            return File(userProfile.Picture, "image/jpg");
+            return View(await LoadUsersAsync(users));
         }
 
         public async Task<IActionResult> Details(string? id)
         {
-            var user = await GetUserAsync(id);
+            var user = await LoadUserAsync(id);
             if (user is null)
             {
                 return NotFound();
@@ -61,7 +44,7 @@ namespace UserControl.Controllers
         [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> Edit(string? id)
         {
-            var user = await GetUserAsync(id);
+            var user = await LoadUserAsync(id);
             if (user is null)
             {
                 return NotFound();
@@ -73,16 +56,16 @@ namespace UserControl.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,Email,IsAdmin")] DisplayUserModel displayUser)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,IsAdmin")] DisplayUserModel user)
         {
-            if (id != displayUser.Id)
+            if (id != user.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                if (await TryChangeRoleAsync(id, displayUser.IsAdmin))
+                if (await TryChangeRoleAsync(id, user.IsAdmin))
                 {
                     return RedirectToAction(nameof(Index));
                 }
@@ -92,13 +75,13 @@ namespace UserControl.Controllers
                 }
             }
 
-            return View(displayUser);
+            return View(user);
         }
 
         [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> Delete(string? id)
         {
-            var user = await GetUserAsync(id);
+            var user = await LoadUserAsync(id);
             if (user is null)
             {
                 return NotFound();
@@ -112,7 +95,7 @@ namespace UserControl.Controllers
         [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Users == null)
+            if (_context.Users is null)
             {
                 return Problem($"Entity set {nameof(_context.Users)} is null.");
             }
@@ -127,9 +110,27 @@ namespace UserControl.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> LoadUserPicture(string? id)
+        {
+            var user = await LoadUserAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            if (user.Picture is null)
+            {
+                var webRoot = webHostEnvironment_.WebRootPath;
+                var defaultPicturePath = Path.Combine(webRoot, "images", "no_user_picture.png");
+                return File(new FileStream(defaultPicturePath, FileMode.Open), "image/png");
+            }
+
+            return File(user.Picture, $"image/{user.PictureType}");
+        }
+
         private async Task<bool> TryChangeRoleAsync(string? id, bool makeAdmin)
         {
-            var user = await GetUserAsync(id);
+            var user = await LoadUserAsync(id);
             if (user is null)
             {
                 return false;
@@ -152,7 +153,7 @@ namespace UserControl.Controllers
             return true;
         }
 
-        private async Task<DisplayUserModel?> GetUserAsync(string? id)
+        private async Task<DisplayUserModel?> LoadUserAsync(string? id)
         {
             if (id is null || _context.Users is null)
             {
@@ -165,22 +166,36 @@ namespace UserControl.Controllers
                 return null;
             }
 
-            return await ToDisplayUserAsync(user);
+            return await LoadUserAsync(user);
         }
 
-        private async Task<DisplayUserModel> ToDisplayUserAsync(IdentityUser user)
+        private async Task<DisplayUserModel> LoadUserAsync(IdentityUser user)
         {
             var isAdmin = await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = _context.AdminRole.Id });
-            return new() { Id = user.Id, UserName = user.UserName, Email = user.Email, IsAdmin = isAdmin };
+            var displayUser = new DisplayUserModel()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                IsAdmin = isAdmin
+            };
+
+            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            if (userProfile is not null)
+            {
+                displayUser.Picture = userProfile.Picture;
+                displayUser.PictureType = userProfile.PictureType;
+            }
+
+            return displayUser;
         }
 
-        private async Task<List<DisplayUserModel>> ToDisplayUsersAsync(IEnumerable<IdentityUser> users)
+        private async Task<IEnumerable<DisplayUserModel>> LoadUsersAsync(IEnumerable<IdentityUser> users)
         {
             var result = new List<DisplayUserModel>();
 
             foreach (var user in users)
             {
-                result.Add(await ToDisplayUserAsync(user));
+                result.Add(await LoadUserAsync(user));
             }
 
             return result;

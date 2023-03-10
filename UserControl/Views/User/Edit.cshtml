@@ -5,31 +5,22 @@
 }
 
 <h1>Edit</h1>
-
-<h4>User</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="UserName" />
-            <input type="hidden" asp-for="Email" />
             <div>
                 <dl class="row">
                     <dt>
-                        @Html.DisplayNameFor(model => model.UserName)
+                        User Name
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.UserName)
                     </dd>
                     <dt>
-                        @Html.DisplayNameFor(model => model.Email)
-                    </dt>
-                    <dd>
-                        @Html.DisplayFor(model => model.Email)
-                    </dd>
-                    <dt>
-                        @Html.DisplayNameFor(model => model.IsAdmin)
+                        Administrator
                     </dt>
                     <dd>
                         <input asp-for="IsAdmin" />

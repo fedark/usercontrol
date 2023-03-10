@@ -4,7 +4,8 @@
     {
         public string Id { get; set; }
         public string UserName { get; set; }
-        public string Email { get; set; }
+        public byte[]? Picture { get; set; }
+        public string? PictureType { get; set; }
         public bool IsAdmin { get; set; }
     }
 }

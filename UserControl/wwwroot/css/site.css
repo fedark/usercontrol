@@ -18,5 +18,10 @@ body {
 }
 
 .img-user {
-    max-width: 20%;
+    max-width: 10rem;
+}
+
+.img-user-small {
+    max-width: 7rem;
+    max-height: 7rem;
 }
