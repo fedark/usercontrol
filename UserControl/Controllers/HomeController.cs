@@ -20,12 +20,7 @@ namespace UserControl.Controllers
 
         public IActionResult Index()
 		{
-			return View();
-		}
-
-		public IActionResult Privacy()
-		{
-			return View();
+            return RedirectToAction("Index", "User");
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
