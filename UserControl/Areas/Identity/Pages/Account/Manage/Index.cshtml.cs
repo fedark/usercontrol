@@ -53,14 +53,6 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-
             [Display(Name = "User Picture")]
             [DataType(DataType.Upload)]
             public IFormFile UserPicture { get; set; }
@@ -68,15 +60,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
 
         private async Task LoadAsync(IdentityUser user)
         {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
+            Username = await _userManager.GetUserNameAsync(user);
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -105,17 +89,6 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
-            }
-
             if (Input.UserPicture?.Length > 0)
             {
                 using var memoryStream = new MemoryStream();
@@ -125,7 +98,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 if (memoryStream.Length < 4 * 1024 * 1024)
                 {
                     var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id) ??
-                        new UserProfile { UserId = user.Id };
+                        new UserProfile { UserId = user.Id, PictureType = Input.UserPicture.ContentType };
                     userProfile.Picture = memoryStream.ToArray();
 
                     _context.UserProfiles.Update(userProfile);

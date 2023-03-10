@@ -16,12 +16,10 @@ namespace UserControl.Controllers
     public partial class UserController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment webHostEnvironment_;
 
-        public UserController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
+        public UserController(AppDbContext context)
         {
             _context = context;
-            webHostEnvironment_ = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index()
@@ -108,24 +106,6 @@ namespace UserControl.Controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> LoadUserPicture(string? id)
-        {
-            var user = await LoadUserAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            if (user.Picture is null)
-            {
-                var webRoot = webHostEnvironment_.WebRootPath;
-                var defaultPicturePath = Path.Combine(webRoot, "images", "no_user_picture.png");
-                return File(new FileStream(defaultPicturePath, FileMode.Open), "image/png");
-            }
-
-            return File(user.Picture, $"image/{user.PictureType}");
         }
 
         private async Task<bool> TryChangeRoleAsync(string? id, bool makeAdmin)

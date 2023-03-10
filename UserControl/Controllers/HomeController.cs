@@ -28,32 +28,5 @@ namespace UserControl.Controllers
 		{
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
-
-        public async Task<IActionResult> LoadUserPictureAsync(string? id)
-        {
-            var user = await GetUserAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (userProfile is null)
-            {
-                return NotFound();
-            }
-
-            return File(userProfile.Picture, "image/jpg");
-        }
-
-        private async Task<IdentityUser?> GetUserAsync(string? id)
-        {
-            if (id is null || _context.Users is null)
-            {
-                return null;
-            }
-
-            return await _context.Users.FindAsync(id);
-        }
     }
 }

@@ -27,7 +27,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                <img src='@Url.Action("LoadUserPicture", new { id = item.Id })' class="img-thumbnail img-user-small" />
+                <img src='@Url.Action("LoadUserPicture", "UserPicture", new { id = item.Id })' class="img-thumbnail img-user-small" />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.UserName)
