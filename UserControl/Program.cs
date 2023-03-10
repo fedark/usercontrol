@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using UserControl.Access;
 using UserControl.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("NotSelf", policyBuilder =>
+		policyBuilder.AddRequirements(new NotSelfUserRequirement()));
+});
+
+builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
 
 var app = builder.Build();
 

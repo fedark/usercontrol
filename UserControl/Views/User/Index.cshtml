@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<DisplayUserModel>
 @inject AppDbContext _context
+@inject UserManager<IdentityUser> UserManager
 
 @{
     ViewData["Title"] = "Index";
@@ -49,7 +50,7 @@
                 
                     </td>
                 }
-            @if (User.IsInRole(_context.AdminRole.Name))
+            @if (User.IsInRole(_context.AdminRole.Name) && UserManager.GetUserId(User) != item.Id)
                 {
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

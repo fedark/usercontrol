@@ -58,7 +58,7 @@ namespace UserControl.Controllers
             return View(user);
         }
 
-        [Authorize(Roles = AppDbContext.AdminName)]
+        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> Edit(string? id)
         {
             var user = await GetUserAsync(id);
@@ -72,7 +72,7 @@ namespace UserControl.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppDbContext.AdminName)]
+        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,Email,IsAdmin")] DisplayUserModel displayUser)
         {
             if (id != displayUser.Id)
@@ -95,7 +95,7 @@ namespace UserControl.Controllers
             return View(displayUser);
         }
 
-        [Authorize(Roles = AppDbContext.AdminName)]
+        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> Delete(string? id)
         {
             var user = await GetUserAsync(id);
@@ -109,7 +109,7 @@ namespace UserControl.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppDbContext.AdminName)]
+        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Users == null)
