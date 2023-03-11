@@ -11,7 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<IdentityUser>()
-	.AddRoles<IdentityRole>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 // Add services to the container.
@@ -19,8 +19,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthorization(options =>
 {
-	options.AddPolicy("NotSelf", policyBuilder =>
-		policyBuilder.AddRequirements(new NotSelfUserRequirement()));
+    options.AddPolicy("NotSelf", policyBuilder =>
+        policyBuilder.AddRequirements(new NotSelfUserRequirement()));
 });
 
 builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
@@ -30,19 +30,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Home/Error");
 }
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();;
+app.UseAuthentication();
+;
 
 app.UseAuthorization();
 
 app.MapRazorPages();
 
 app.MapControllerRoute(
-	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
