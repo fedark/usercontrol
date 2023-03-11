@@ -11,13 +11,15 @@ namespace UserControl.Controllers
     public partial class UserController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly RoleManager<IdentityRole> roleManager_;
 
-        public UserController(AppDbContext context)
-        {
-            _context = context;
-        }
+		public UserController(AppDbContext context, RoleManager<IdentityRole> roleManager)
+		{
+			_context = context;
+			roleManager_ = roleManager;
+		}
 
-        public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
             return View(await LoadUsersAsync(users));
@@ -111,13 +113,14 @@ namespace UserControl.Controllers
                 return false;
             }
 
+            var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
             if (!user.IsAdmin && makeAdmin)
             {
-                await _context.UserRoles.AddAsync(new() { UserId = user.Id, RoleId = _context.AdminRole.Id });
+                await _context.UserRoles.AddAsync(new() { UserId = user.Id, RoleId = adminRole.Id });
             }
             else if (user.IsAdmin && !makeAdmin)
             {
-                var userRole = await _context.UserRoles.FindAsync(user.Id, _context.AdminRole.Id);
+                var userRole = await _context.UserRoles.FindAsync(user.Id, adminRole.Id);
                 if (userRole is not null)
                 {
                     _context.UserRoles.Remove(userRole);
@@ -146,7 +149,8 @@ namespace UserControl.Controllers
 
         private async Task<DisplayUserModel> LoadUserAsync(IdentityUser user)
         {
-            var isAdmin = await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = _context.AdminRole.Id });
+			var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
+			var isAdmin = await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = adminRole.Id });
             var displayUser = new DisplayUserModel()
             {
                 Id = user.Id,
