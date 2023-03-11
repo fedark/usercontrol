@@ -5,7 +5,7 @@ using UserControl.Access;
 using UserControl.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("UserControlLocalDB");
+var connectionString = builder.Configuration.GetConnectionString("UserControlContainerDB");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
