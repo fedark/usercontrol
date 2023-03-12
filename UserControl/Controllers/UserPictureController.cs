@@ -8,12 +8,10 @@ namespace UserControl.Controllers
     public class UserPictureController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment webHostEnvironment_;
 
-        public UserPictureController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
+        public UserPictureController(AppDbContext context)
         {
             _context = context;
-            webHostEnvironment_ = webHostEnvironment;
         }
 
         public async Task<IActionResult> LoadUserPicture(string? id)
@@ -30,9 +28,7 @@ namespace UserControl.Controllers
                 return File(userProfile.Picture, userProfile.PictureType);
             }
 
-            var webRoot = webHostEnvironment_.WebRootPath;
-            var defaultPicturePath = Path.Combine(webRoot, "images", "no_user_picture.png");
-            return File(new FileStream(defaultPicturePath, FileMode.Open), "image/png");
+            return File("~/images/no_user_picture.png", "image/png");
         }
 
         private async Task<IdentityUser?> LoadUserAsync(string? id)
