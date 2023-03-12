@@ -7,5 +7,11 @@
         public byte[]? Picture { get; set; }
         public string? PictureType { get; set; }
         public bool IsAdmin { get; set; }
-    }
+
+		public DisplayUserModel(string id, string userName)
+		{
+			Id = id;
+			UserName = userName;
+		}
+	}
 }

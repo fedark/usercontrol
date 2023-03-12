@@ -151,10 +151,8 @@ namespace UserControl.Controllers
         {
 			var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
 			var isAdmin = await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = adminRole.Id });
-            var displayUser = new DisplayUserModel()
+            var displayUser = new DisplayUserModel(user.Id, user.UserName)
             {
-                Id = user.Id,
-                UserName = user.UserName,
                 IsAdmin = isAdmin
             };
 

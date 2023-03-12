@@ -1,4 +1,6 @@
-﻿namespace UserControl.Models
+﻿#nullable disable
+
+namespace UserControl.Models
 {
     public class UserProfile
     {
