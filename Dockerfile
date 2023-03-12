@@ -12,6 +12,4 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0 as runtime
 WORKDIR /usercontrol
 COPY --from=sdk /usercontrol/UserControl/publish/. ./
 
-ENV ASPNETCORE_ENVIRONMENT=Production
-EXPOSE 7887
 ENTRYPOINT [ "dotnet", "UserControl.dll" ]

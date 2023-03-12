@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    image: fedark/usercontrol
+    container_name: user
+    ports:
+      - 7887:80
+    environment:
+      - ConnectionStrings:Default=server=sql,1433;database=UserControl;Trust Server Certificate=true;user=sa;password=UserControl!
+    depends_on:
+      - sql  
+
+  sql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=UserControl!
+    ports:
+      - 1433:1433
+    volumes:
+      - db-data:/var/opt/mssql
+
+volumes:
+  db-data:

@@ -5,7 +5,8 @@ using UserControl.Access;
 using UserControl.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("UserControlContainerDB");
+var connectionString = builder.Configuration.GetConnectionString("Default") ??
+    builder.Configuration.GetConnectionString("UserControlLocalDB");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -26,6 +27,12 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+	var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
