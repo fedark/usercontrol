@@ -24,7 +24,14 @@ builder.Services.AddAuthorization(options =>
         policyBuilder.AddRequirements(new NotSelfUserRequirement()));
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("NotPrimeAdmin", policyBuilder =>
+        policyBuilder.AddRequirements(new NotPrimeAdminRequirement()));
+});
+
 builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
+builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminHandler>();
 
 var app = builder.Build();
 
@@ -43,7 +50,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication();
-;
 
 app.UseAuthorization();
 
