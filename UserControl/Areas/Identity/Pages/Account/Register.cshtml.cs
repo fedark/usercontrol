@@ -3,12 +3,16 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using UserControl.Data;
+using UserControl.Models;
+using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account
 {
@@ -20,6 +24,7 @@ namespace UserControl.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
+        private readonly DefaultUserProfileProvider userProfileProvider_;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -27,7 +32,8 @@ namespace UserControl.Areas.Identity.Pages.Account
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            AppDbContext context)
+            AppDbContext context,
+            DefaultUserProfileProvider userProfileProvider)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -35,6 +41,7 @@ namespace UserControl.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _context = context;
+            userProfileProvider_ = userProfileProvider;
         }
 
         /// <summary>
@@ -108,6 +115,8 @@ namespace UserControl.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    await CreateUserProfile(user);
+
                     _logger.LogInformation("User created a new account with password.");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -121,6 +130,13 @@ namespace UserControl.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private async Task CreateUserProfile(IdentityUser user)
+        {
+            var userProfile = await userProfileProvider_.GetDefaultProfileAsync(user);
+            await _context.UserProfiles.AddAsync(userProfile);
+            await _context.SaveChangesAsync();
         }
 
         private IdentityUser CreateUser()

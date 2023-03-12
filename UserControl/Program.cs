@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserControl.Access;
 using UserControl.Data;
+using UserControl.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Default") ??
@@ -32,6 +33,8 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
 builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminHandler>();
+
+builder.Services.AddTransient<DefaultUserProfileProvider>();
 
 var app = builder.Build();
 

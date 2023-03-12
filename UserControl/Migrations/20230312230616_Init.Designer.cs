@@ -12,8 +12,8 @@ using UserControl.Data;
 namespace UserControl.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230311192823_AdminSeed")]
-    partial class AdminSeed
+    [Migration("20230312230616_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,15 +50,6 @@ namespace UserControl.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "5861c623-9585-42cb-a37c-5be2e9f4a528",
-                            ConcurrencyStamp = "2169a735-d5d1-4157-a048-42ae8b125dec",
-                            Name = "admin",
-                            NormalizedName = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -149,22 +140,6 @@ namespace UserControl.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "d6e972db-6e0a-4b5a-8bde-4d34962d1706",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "8c0f716f-1069-4559-9028-fea7bc205d8f",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAENhlyHGL/3s+iuG3sBNOLSaQ2Fru8GuJhHYcKK+k0VfDEx/C1Uph04KlCHcijIB0Sg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "0db42630-8a85-4bf6-92c9-4d88f87727b2",
-                            TwoFactorEnabled = false,
-                            UserName = "admin"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -229,13 +204,6 @@ namespace UserControl.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "d6e972db-6e0a-4b5a-8bde-4d34962d1706",
-                            RoleId = "5861c623-9585-42cb-a37c-5be2e9f4a528"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -261,22 +229,16 @@ namespace UserControl.Migrations
 
             modelBuilder.Entity("UserControl.Models.UserProfile", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<byte[]>("Picture")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PictureType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

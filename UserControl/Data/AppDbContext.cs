@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using UserControl.Models;
+using UserControl.Services;
 
 namespace UserControl.Data
 {
@@ -11,23 +12,30 @@ namespace UserControl.Data
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
-        public AppDbContext(DbContextOptions options) : base(options)
+        private readonly DefaultUserProfileProvider userProfileProvider_;
+
+        public AppDbContext(DbContextOptions options, DefaultUserProfileProvider userProfileProvider) : base(options)
         {
+            userProfileProvider_ = userProfileProvider;
         }
 
-		protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
 
             var adminRole = new IdentityRole(AdminName) { NormalizedName = AdminName.ToUpper() };
-			var adminUser = new IdentityUser(AdminName) { NormalizedUserName = AdminName.ToUpper() };
 
-			var passwordHasher = new PasswordHasher<IdentityUser>();
+			var adminUser = new IdentityUser(AdminName) { NormalizedUserName = AdminName.ToUpper() };
+            var passwordHasher = new PasswordHasher<IdentityUser>();
             adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "Ad!min0");
 
-			builder.Entity<IdentityRole>().HasData(adminRole);
+            var adminUserRole = new IdentityUserRole<string> { RoleId = adminRole.Id, UserId = adminUser.Id };
+            var adminProfile = userProfileProvider_.GetDefaultProfile(adminUser);
+
+            builder.Entity<IdentityRole>().HasData(adminRole);
             builder.Entity<IdentityUser>().HasData(adminUser);
-            builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string> { RoleId = adminRole.Id, UserId = adminUser.Id });
+            builder.Entity<IdentityUserRole<string>>().HasData(adminUserRole);
+            builder.Entity<UserProfile>().HasData(adminProfile);
 		}
 	}
 }

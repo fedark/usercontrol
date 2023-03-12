@@ -23,12 +23,12 @@ namespace UserControl.Controllers
             }
 
             var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (userProfile is not null)
+            if (userProfile is null)
             {
-                return File(userProfile.Picture, userProfile.PictureType);
+                return NotFound();
             }
 
-            return File("~/images/no_user_picture.png", "image/png");
+            return File(userProfile.Picture, userProfile.PictureType);
         }
 
         private async Task<IdentityUser?> LoadUserAsync(string? id)
