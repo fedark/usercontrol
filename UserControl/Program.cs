@@ -35,6 +35,7 @@ builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
 builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminHandler>();
 
 builder.Services.AddTransient<DefaultUserProfileProvider>();
+builder.Services.AddTransient<AdminRoleManager>();
 
 var app = builder.Build();
 

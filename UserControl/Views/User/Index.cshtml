@@ -1,8 +1,7 @@
-﻿@using Microsoft.EntityFrameworkCore;
+﻿@using UserControl.Services;
 @model IEnumerable<DisplayUserModel>
 @inject UserManager<IdentityUser> UserManager
-@inject RoleManager<IdentityRole> RoleManager
-@inject AppDbContext Context
+@inject AdminRoleManager AdminRoleManager
 
 @{
     ViewData["Title"] = "Users";
@@ -10,10 +9,9 @@
 
     async Task<bool> allowModifyAsync(DisplayUserModel user)
     {
-        var primeAdminRole = await RoleManager.FindByNameAsync(AppDbContext.PrimeAdminName);
         return isAdmin &&
             UserManager.GetUserId(User) != user.Id &&
-            !(await Context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = primeAdminRole.Id }));
+            !(await AdminRoleManager.IsPrimeAdminAsync(user.Id));
     }
 }
 

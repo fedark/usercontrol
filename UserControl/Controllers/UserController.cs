@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserControl.Data;
 using UserControl.Models;
+using UserControl.Services;
 
 namespace UserControl.Controllers
 {
@@ -12,12 +13,14 @@ namespace UserControl.Controllers
     {
         private readonly AppDbContext _context;
         private readonly RoleManager<IdentityRole> roleManager_;
+        private readonly AdminRoleManager adminRoleManager_;
 
-		public UserController(AppDbContext context, RoleManager<IdentityRole> roleManager)
+        public UserController(AppDbContext context, RoleManager<IdentityRole> roleManager, AdminRoleManager adminRoleManager)
 		{
 			_context = context;
 			roleManager_ = roleManager;
-		}
+            adminRoleManager_ = adminRoleManager;
+        }
 
 		public async Task<IActionResult> Index()
         {
@@ -157,7 +160,7 @@ namespace UserControl.Controllers
 
         private async Task<DisplayUserModel> LoadUserAsync(IdentityUser user)
         {
-            var isAdmin = await IsAdmin(user);
+            var isAdmin = await adminRoleManager_.IsAdminAsync(user.Id);
             var displayUser = new DisplayUserModel
             {
                 Id = user.Id,
@@ -173,14 +176,6 @@ namespace UserControl.Controllers
             }
 
             return displayUser;
-        }
-
-        private async Task<bool> IsAdmin(IdentityUser user)
-        {
-            var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
-            var primeAdminRole = await roleManager_.FindByNameAsync(AppDbContext.PrimeAdminName);
-            return await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = adminRole.Id }) ||
-                await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = primeAdminRole.Id });
         }
 
         private async Task<IEnumerable<DisplayUserModel>> LoadUsersAsync(IEnumerable<IdentityUser> users)
