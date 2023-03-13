@@ -31,8 +31,15 @@ builder.Services.AddAuthorization(options =>
         policyBuilder.AddRequirements(new NotPrimeAdminRequirement()));
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("NotPrimeAdminUser", policyBuilder =>
+        policyBuilder.AddRequirements(new NotPrimeAdminUserRequirement()));
+});
+
 builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
 builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminHandler>();
+builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminUserHandler>();
 
 builder.Services.AddTransient<DefaultUserProfileProvider>();
 builder.Services.AddTransient<AdminRoleManager>();

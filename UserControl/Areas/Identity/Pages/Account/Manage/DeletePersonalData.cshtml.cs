@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
 {
-    [Authorize(Policy = "NotPrimeAdmin")]
+    [Authorize(Policy = "NotPrimeAdminUser")]
     public class DeletePersonalDataModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
