@@ -9,6 +9,7 @@ namespace UserControl.Data
     public class AppDbContext : IdentityDbContext
     {
         public const string AdminName = "admin";
+        public const string PrimeAdminName = "prime_admin";
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
@@ -24,18 +25,20 @@ namespace UserControl.Data
 			base.OnModelCreating(builder);
 
             var adminRole = new IdentityRole(AdminName) { NormalizedName = AdminName.ToUpper() };
+            var primeAdminRole = new IdentityRole(PrimeAdminName) { NormalizedName = PrimeAdminName.ToUpper() };
 
-			var adminUser = new IdentityUser(AdminName) { NormalizedUserName = AdminName.ToUpper() };
+			var primeAdminUser = new IdentityUser(AdminName) { NormalizedUserName = AdminName.ToUpper() };
             var passwordHasher = new PasswordHasher<IdentityUser>();
-            adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "Ad!min0");
+            primeAdminUser.PasswordHash = passwordHasher.HashPassword(primeAdminUser, "Ad!min0");
 
-            var adminUserRole = new IdentityUserRole<string> { RoleId = adminRole.Id, UserId = adminUser.Id };
-            var adminProfile = userProfileProvider_.GetDefaultProfile(adminUser);
+            var primeAdminUserRole = new IdentityUserRole<string> { RoleId = primeAdminRole.Id, UserId = primeAdminUser.Id };
+            var primeAdminProfile = userProfileProvider_.GetDefaultProfile(primeAdminUser);
 
             builder.Entity<IdentityRole>().HasData(adminRole);
-            builder.Entity<IdentityUser>().HasData(adminUser);
-            builder.Entity<IdentityUserRole<string>>().HasData(adminUserRole);
-            builder.Entity<UserProfile>().HasData(adminProfile);
+            builder.Entity<IdentityRole>().HasData(primeAdminRole);
+            builder.Entity<IdentityUser>().HasData(primeAdminUser);
+            builder.Entity<IdentityUserRole<string>>().HasData(primeAdminUserRole);
+            builder.Entity<UserProfile>().HasData(primeAdminProfile);
 		}
 	}
 }

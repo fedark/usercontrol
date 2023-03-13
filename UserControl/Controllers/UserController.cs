@@ -36,7 +36,9 @@ namespace UserControl.Controllers
             return View(user);
         }
 
-        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
+        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
+        [Authorize(Policy = "NotSelf")]
+        [Authorize(Policy = "NotPrimeAdmin")]
         public async Task<IActionResult> Edit(string? id)
         {
             var user = await LoadUserAsync(id);
@@ -50,7 +52,9 @@ namespace UserControl.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
+        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
+        [Authorize(Policy = "NotSelf")]
+        [Authorize(Policy = "NotPrimeAdmin")]
         public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,IsAdmin")] DisplayUserModel user)
         {
             if (id != user.Id)
@@ -73,7 +77,9 @@ namespace UserControl.Controllers
             return View(user);
         }
 
-        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
+        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
+        [Authorize(Policy = "NotSelf")]
+        [Authorize(Policy = "NotPrimeAdmin")]
         public async Task<IActionResult> Delete(string? id)
         {
             var user = await LoadUserAsync(id);
@@ -87,7 +93,9 @@ namespace UserControl.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppDbContext.AdminName, Policy = "NotSelf")]
+        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
+        [Authorize(Policy = "NotSelf")]
+        [Authorize(Policy = "NotPrimeAdmin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Users is null)
@@ -149,8 +157,7 @@ namespace UserControl.Controllers
 
         private async Task<DisplayUserModel> LoadUserAsync(IdentityUser user)
         {
-			var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
-			var isAdmin = await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = adminRole.Id });
+            var isAdmin = await IsAdmin(user);
             var displayUser = new DisplayUserModel
             {
                 Id = user.Id,
@@ -166,6 +173,14 @@ namespace UserControl.Controllers
             }
 
             return displayUser;
+        }
+
+        private async Task<bool> IsAdmin(IdentityUser user)
+        {
+            var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
+            var primeAdminRole = await roleManager_.FindByNameAsync(AppDbContext.PrimeAdminName);
+            return await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = adminRole.Id }) ||
+                await _context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = primeAdminRole.Id });
         }
 
         private async Task<IEnumerable<DisplayUserModel>> LoadUsersAsync(IEnumerable<IdentityUser> users)

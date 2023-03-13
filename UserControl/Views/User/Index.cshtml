@@ -1,8 +1,20 @@
-﻿@model IEnumerable<DisplayUserModel>
+﻿@using Microsoft.EntityFrameworkCore;
+@model IEnumerable<DisplayUserModel>
 @inject UserManager<IdentityUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject AppDbContext Context
 
 @{
     ViewData["Title"] = "Users";
+    var isAdmin = User.IsInRole(AppDbContext.AdminName) || User.IsInRole(AppDbContext.PrimeAdminName);
+
+    async Task<bool> allowModifyAsync(DisplayUserModel user)
+    {
+        var primeAdminRole = await RoleManager.FindByNameAsync(AppDbContext.PrimeAdminName);
+        return isAdmin &&
+            UserManager.GetUserId(User) != user.Id &&
+            !(await Context.UserRoles.ContainsAsync(new() { UserId = user.Id, RoleId = primeAdminRole.Id }));
+    }
 }
 
 <h1>Users</h1>
@@ -43,7 +55,7 @@
                 
                     </td>
                 }
-            @if (User.IsInRole(AppDbContext.AdminName) && UserManager.GetUserId(User) != item.Id)
+                @if (await allowModifyAsync(item))
                 {
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
@@ -57,7 +69,6 @@
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                     </td>
                 }
-
         </tr>
 }
     </tbody>

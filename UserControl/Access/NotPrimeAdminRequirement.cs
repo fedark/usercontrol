@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using UserControl.Data;
 
 namespace UserControl.Access;
@@ -10,23 +11,31 @@ public class NotPrimeAdminRequirement : IAuthorizationRequirement
 
 public class NotPrimeAdminHandler : AuthorizationHandler<NotPrimeAdminRequirement>
 {
-    private readonly UserManager<IdentityUser> userManager_;
+    private readonly RoleManager<IdentityRole> roleManager_;
+    private readonly AppDbContext context_;
 
-    public NotPrimeAdminHandler(UserManager<IdentityUser> userManager)
+    public NotPrimeAdminHandler(RoleManager<IdentityRole> roleManager, AppDbContext context)
     {
-        userManager_ = userManager;
+        roleManager_ = roleManager;
+        context_ = context;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, NotPrimeAdminRequirement requirement)
     {
-        var user = await userManager_.GetUserAsync(context.User);
-        if (user.UserName != AppDbContext.AdminName)
+        if (context.Resource is HttpContext httpContext)
         {
-            context.Succeed(requirement);
-        }
-        else
-        {
-            context.Fail();
+            var id = httpContext.Request.RouteValues["id"];
+            var primeAdminRole = await roleManager_.FindByNameAsync(AppDbContext.PrimeAdminName);
+
+            if (id is string userId && 
+                (await context_.UserRoles.ContainsAsync(new() { UserId = userId, RoleId = primeAdminRole.Id })))
+            {
+                context.Fail();              
+            }
+            else
+            {
+                context.Succeed(requirement);
+            }
         }
     }
 }
