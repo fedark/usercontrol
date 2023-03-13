@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using UserControl.Data;
 using UserControl.Models;
+using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
 {
@@ -17,15 +18,18 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly AppDbContext _context;
+        private readonly DefaultUserProfileProvider userProfileProvider_;
 
         public IndexModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            AppDbContext context)
+            AppDbContext context,
+            DefaultUserProfileProvider userProfileProvider)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            userProfileProvider_ = userProfileProvider;
         }
 
         /// <summary>
@@ -107,6 +111,34 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
+
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "Your profile has been updated";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeletePictureAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var defaultProfile = await userProfileProvider_.GetDefaultProfileAsync(user);
+            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+
+            if (userProfile is null)
+            {
+                userProfile = defaultProfile;
+            }
+            else
+            {
+                userProfile.Picture = defaultProfile.Picture;
+            }
+
+            _context.UserProfiles.Update(userProfile);
+            await _context.SaveChangesAsync();
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
