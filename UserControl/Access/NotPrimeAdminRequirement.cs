@@ -24,7 +24,7 @@ public class NotPrimeAdminHandler : AuthorizationHandler<NotPrimeAdminRequiremen
 
             if (id is string userId && await adminRoleManager_.IsPrimeAdminAsync(userId))
             {
-                context.Fail();              
+                context.Fail();
             }
             else
             {

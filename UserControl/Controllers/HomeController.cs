@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using UserControl.Data;
 using UserControl.Models;
 
 namespace UserControl.Controllers
 {
     public class HomeController : Controller
     {
-		public HomeController()
+        public HomeController()
         {
         }
 

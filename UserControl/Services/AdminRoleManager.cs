@@ -19,7 +19,7 @@ public class AdminRoleManager
     {
         var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
 
-        return await IsPrimeAdminAsync(userId) || 
+        return await IsPrimeAdminAsync(userId) ||
             await context_.UserRoles.ContainsAsync(new() { UserId = userId, RoleId = adminRole.Id });
     }
 

@@ -16,13 +16,13 @@ namespace UserControl.Controllers
         private readonly AdminRoleManager adminRoleManager_;
 
         public UserController(AppDbContext context, RoleManager<IdentityRole> roleManager, AdminRoleManager adminRoleManager)
-		{
-			_context = context;
-			roleManager_ = roleManager;
+        {
+            _context = context;
+            roleManager_ = roleManager;
             adminRoleManager_ = adminRoleManager;
         }
 
-		public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
             return View(await LoadUsersAsync(users));

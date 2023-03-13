@@ -3,15 +3,12 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using UserControl.Data;
-using UserControl.Models;
 using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account

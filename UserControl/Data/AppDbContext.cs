@@ -21,13 +21,13 @@ namespace UserControl.Data
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
-		{
-			base.OnModelCreating(builder);
+        {
+            base.OnModelCreating(builder);
 
             var adminRole = new IdentityRole(AdminName) { NormalizedName = AdminName.ToUpper() };
             var primeAdminRole = new IdentityRole(PrimeAdminName) { NormalizedName = PrimeAdminName.ToUpper() };
 
-			var primeAdminUser = new IdentityUser(AdminName) { NormalizedUserName = AdminName.ToUpper() };
+            var primeAdminUser = new IdentityUser(AdminName) { NormalizedUserName = AdminName.ToUpper() };
             var passwordHasher = new PasswordHasher<IdentityUser>();
             primeAdminUser.PasswordHash = passwordHasher.HashPassword(primeAdminUser, "Ad!min0");
 
@@ -39,6 +39,6 @@ namespace UserControl.Data
             builder.Entity<IdentityUser>().HasData(primeAdminUser);
             builder.Entity<IdentityUserRole<string>>().HasData(primeAdminUserRole);
             builder.Entity<UserProfile>().HasData(primeAdminProfile);
-		}
-	}
+        }
+    }
 }
