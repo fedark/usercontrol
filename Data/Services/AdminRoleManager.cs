@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Data.Db;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UserControl.Data;
 
-namespace UserControl.Services;
+namespace Data.Services;
 
 public class AdminRoleManager
 {

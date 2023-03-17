@@ -1,8 +1,9 @@
+using Data.Db;
+using Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserControl.Access;
-using UserControl.Data;
 using UserControl.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +56,7 @@ builder.Services.AddTransient<IAuthorizationHandler, NotSelfUserHandler>();
 builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminHandler>();
 builder.Services.AddTransient<IAuthorizationHandler, NotPrimeAdminUserHandler>();
 
-builder.Services.AddTransient<DefaultUserProfileProvider>();
+builder.Services.AddTransient<UserProfileProvider>();
 builder.Services.AddTransient<AdminRoleManager>();
 
 var app = builder.Build();

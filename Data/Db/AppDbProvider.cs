@@ -1,4 +1,4 @@
-﻿namespace UserControl.Data;
+﻿namespace Data.Db;
 
 public enum AppDbProvider
 {

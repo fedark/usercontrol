@@ -3,12 +3,12 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
+using Data.Db;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using UserControl.Data;
 using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account
@@ -21,7 +21,7 @@ namespace UserControl.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
-        private readonly DefaultUserProfileProvider userProfileProvider_;
+        private readonly UserProfileProvider userProfileProvider_;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -30,7 +30,7 @@ namespace UserControl.Areas.Identity.Pages.Account
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
             AppDbContext context,
-            DefaultUserProfileProvider userProfileProvider)
+            UserProfileProvider userProfileProvider)
         {
             _userManager = userManager;
             _userStore = userStore;

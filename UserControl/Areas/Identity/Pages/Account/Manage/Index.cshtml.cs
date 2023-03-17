@@ -3,12 +3,12 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
+using Data.Db;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using UserControl.Data;
-using UserControl.Models;
 using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
@@ -18,13 +18,13 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly AppDbContext _context;
-        private readonly DefaultUserProfileProvider userProfileProvider_;
+        private readonly UserProfileProvider userProfileProvider_;
 
         public IndexModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             AppDbContext context,
-            DefaultUserProfileProvider userProfileProvider)
+            UserProfileProvider userProfileProvider)
         {
             _userManager = userManager;
             _signInManager = signInManager;

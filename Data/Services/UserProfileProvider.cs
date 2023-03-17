@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using UserControl.Models;
+﻿using System.Reflection;
+using Data.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace UserControl.Services;
 
-public class DefaultUserProfileProvider
+public class UserProfileProvider
 {
-    private readonly IWebHostEnvironment webHostEnvironment_;
-
-    public DefaultUserProfileProvider(IWebHostEnvironment webHostEnvironment)
+    public UserProfileProvider()
     {
-        webHostEnvironment_ = webHostEnvironment;
     }
 
     public UserProfile GetDefaultProfile(IdentityUser user)
@@ -30,8 +28,18 @@ public class DefaultUserProfileProvider
 
     private string GetDefaultPicturePath()
     {
-        var webRoot = webHostEnvironment_.WebRootPath;
-        return Path.Combine(webRoot, "images", "no_user_picture.png");
+        var staticDataDir = "static_data";
+
+        var contentDir = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)!.FullName,
+            typeof(UserProfileProvider).Assembly.GetName().Name!,
+            staticDataDir);
+
+        if (!Directory.Exists(contentDir))
+        {
+            contentDir = Path.Combine(Environment.CurrentDirectory, staticDataDir);
+        }
+
+        return Path.Combine(contentDir, "no_user_picture.png");
     }
 
     private UserProfile CreateUserProfile(IdentityUser user, byte[] pictureData)
