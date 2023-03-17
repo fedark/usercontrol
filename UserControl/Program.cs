@@ -6,17 +6,25 @@ using UserControl.Data;
 using UserControl.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("Default") ??
-    builder.Configuration.GetConnectionString("UserControlLocalDB");
+
+if (!Enum.TryParse<AppDbProvider>(builder.Configuration.GetValue("DbProvider", nameof(AppDbProvider.SqlServer)), out var provider))
+{
+    provider = AppDbProvider.SqlServer;
+}
+
+var connectionString = builder.Configuration.GetConnectionString("Default");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseNpgsql(connectionString));
-
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseSqlite(connectionString));
+{
+    _ = provider switch
+    {
+        AppDbProvider.SqlServer => options.UseSqlServer(connectionString ?? builder.Configuration.GetConnectionString("UserControlLocalDB")),
+        AppDbProvider.PostgreSql => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlPostgreSqlDB")),
+        AppDbProvider.Sqlite => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlSqliteDB")),
+        AppDbProvider.ContanerSqlServer => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlContainerDB")),
+        _ => throw new Exception($"Database provider '{provider}' is not supported")
+    };
+});
 
 builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddRoles<IdentityRole>()
