@@ -19,10 +19,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     _ = provider switch
     {
-        AppDbProvider.SqlServer => options.UseSqlServer(connectionString ?? builder.Configuration.GetConnectionString("UserControlLocalDB")),
-        AppDbProvider.PostgreSql => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlPostgreSqlDB")),
-        AppDbProvider.Sqlite => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlSqliteDB")),
-        AppDbProvider.ContanerSqlServer => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlContainerDB")),
+        AppDbProvider.SqlServer => options.UseSqlServer(connectionString ?? builder.Configuration.GetConnectionString("UserControlLocalDB"),
+            b => b.MigrationsAssembly("Data.SqlServerMigrations")),
+        AppDbProvider.PostgreSql => options.UseNpgsql(connectionString ?? builder.Configuration.GetConnectionString("UserControlPostgreSqlDB"),
+            b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
+        AppDbProvider.Sqlite => options.UseSqlite(connectionString ?? builder.Configuration.GetConnectionString("UserControlSqliteDB"),
+            b => b.MigrationsAssembly("Data.SqliteMigrations")),
+        AppDbProvider.ContanerSqlServer => options.UseSqlServer(connectionString ?? builder.Configuration.GetConnectionString("UserControlContainerDB"),
+            b => b.MigrationsAssembly("Data.SqlServerMigrations")),
         _ => throw new Exception($"Database provider '{provider}' is not supported")
     };
 });
