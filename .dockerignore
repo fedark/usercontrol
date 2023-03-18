@@ -21,5 +21,10 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/*.sln
+**/*.ps1
+**/*.db
+**/*.db-shm
+**/*.db-wal
 LICENSE
 README.md

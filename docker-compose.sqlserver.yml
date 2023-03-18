@@ -1,11 +1,12 @@
 services:
   web:
     build: .
-    image: fedark/usercontrol
-    container_name: user
+    image: fedark/usercontrol:db-switch
+    container_name: user-sql
     ports:
       - 7887:80
     environment:
+      - DbProvider=SqlServer
       - ConnectionStrings:Default=server=sql,1433;database=UserControl;Trust Server Certificate=true;user=sa;password=UserControl!
     depends_on:
       - sql  
@@ -17,9 +18,9 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=UserControl!
     ports:
-      - 1433:1433
+      - 1434:1433
     volumes:
-      - db-data:/var/opt/mssql
+      - sql-data:/var/opt/mssql
 
 volumes:
-  db-data:
+  sql-data:

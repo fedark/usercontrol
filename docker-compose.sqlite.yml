@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    image: fedark/usercontrol:db-switch
+    container_name: user-sqlite
+    environment:
+      - DbProvider=Sqlite
+      - ConnectionStrings:Default=Data Source=/usercontrol/sqlite-data/UserControl.db
+    ports:
+      - 7887:80
+    volumes:
+      - sqlite-data:/usercontrol/sqlite-data
+
+volumes:
+  sqlite-data:

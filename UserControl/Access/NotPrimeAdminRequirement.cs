@@ -1,6 +1,5 @@
 ﻿using Data.Services;
 using Microsoft.AspNetCore.Authorization;
-using UserControl.Services;
 
 namespace UserControl.Access;
 

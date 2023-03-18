@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    image: fedark/usercontrol:db-switch
+    container_name: user-pgs
+    environment:
+      - DbProvider=PostgreSql
+      - ConnectionStrings:Default=host=pgs;port=5432;database=UserControl;username=postgres;password=UserControl!
+    ports:
+      - 7887:80
+    depends_on:
+      - pgs
+  
+  pgs:
+    image: postgres
+    container_name: pgs
+    environment:
+      - POSTGRES_PASSWORD=UserControl!
+    ports:
+      - 5433:5432
+    volumes:
+      - pgs-data:/var/lib/postgresql/data
+
+volumes:
+  pgs-data:
