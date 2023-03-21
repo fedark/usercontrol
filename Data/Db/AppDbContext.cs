@@ -34,6 +34,15 @@ public class AppDbContext : IdentityDbContext
         var primeAdminUserRole = new IdentityUserRole<string> { RoleId = primeAdminRole.Id, UserId = primeAdminUser.Id };
         var primeAdminProfile = userProfileProvider_.GetDefaultProfile(primeAdminUser);
 
+        builder.Entity<UserProfile>(entity =>
+        {
+            entity.HasKey(p => p.UserId);
+
+            entity.HasOne<IdentityUser>()
+                .WithOne()
+                .HasForeignKey<UserProfile>(p => p.UserId);
+        });
+
         builder.Entity<IdentityRole>().HasData(adminRole);
         builder.Entity<IdentityRole>().HasData(primeAdminRole);
         builder.Entity<IdentityUser>().HasData(primeAdminUser);
