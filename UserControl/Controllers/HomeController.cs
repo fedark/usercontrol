@@ -12,7 +12,7 @@ namespace UserControl.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("Index", "User");
+            return RedirectToActionPermanent("Index", "User");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
