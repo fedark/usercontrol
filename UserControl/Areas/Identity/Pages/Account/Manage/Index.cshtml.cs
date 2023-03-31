@@ -1,75 +1,50 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
 
 using System.ComponentModel.DataAnnotations;
 using Data.Db;
 using Data.Models;
+using Data.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly AppDbContext _context;
+        private readonly UserManager<User> userManager_;
+        private readonly SignInManager<User> signInManager_;
+        private readonly AppDbContext context_;
         private readonly UserProfileProvider userProfileProvider_;
 
+        public string UserName { get; set; } = default!;
+
+        [TempData]
+        public string StatusMessage { get; set; } = default!;
+
+        [BindProperty]
+        public InputModel Input { get; set; } = default!;
+
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
             AppDbContext context,
             UserProfileProvider userProfileProvider)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _context = context;
+            userManager_ = userManager;
+            signInManager_ = signInManager;
+            context_ = context;
             userProfileProvider_ = userProfileProvider;
-        }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public string Username { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [TempData]
-        public string StatusMessage { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [Display(Name = "User Picture")]
-            [DataType(DataType.Upload)]
-            public IFormFile UserPicture { get; set; }
-        }
-
-        private async Task LoadAsync(IdentityUser user)
-        {
-            Username = await _userManager.GetUserNameAsync(user);
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            var user = await userManager_.GetUserAsync(User);
+            if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
             }
 
             await LoadAsync(user);
@@ -78,10 +53,10 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            var user = await userManager_.GetUserAsync(User);
+            if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -93,17 +68,14 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             if (Input.UserPicture?.Length > 0)
             {
                 using var memoryStream = new MemoryStream();
-
                 await Input.UserPicture.CopyToAsync(memoryStream);
 
                 if (memoryStream.Length < 4 * 1024 * 1024)
                 {
-                    var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id) ??
-                        new UserProfile { UserId = user.Id, PictureType = Input.UserPicture.ContentType };
-                    userProfile.Picture = memoryStream.ToArray();
+                    context_.Entry(user).Reference(u => u.UserProfile).Load();
+                    user.UserProfile.PictureType = Input.UserPicture.ContentType;
 
-                    _context.UserProfiles.Update(userProfile);
-                    await _context.SaveChangesAsync();
+                    await userManager_.UpdateAsync(user);
                 }
                 else
                 {
@@ -112,21 +84,22 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            await _signInManager.RefreshSignInAsync(user);
+            await signInManager_.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
+
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeletePictureAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            var user = await userManager_.GetUserAsync(User);
+            if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
             }
 
-            var defaultProfile = await userProfileProvider_.GetDefaultProfileAsync(user);
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            var defaultProfile = await userProfileProvider_.GetDefaultProfileAsync(user.Id);
+            var userProfile = await context_.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
 
             if (userProfile is null)
             {
@@ -137,12 +110,25 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 userProfile.Picture = defaultProfile.Picture;
             }
 
-            _context.UserProfiles.Update(userProfile);
-            await _context.SaveChangesAsync();
+            context_.UserProfiles.Update(userProfile);
+            await context_.SaveChangesAsync();
 
-            await _signInManager.RefreshSignInAsync(user);
+            await signInManager_.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
+
             return RedirectToPage();
+        }
+
+        private async Task LoadAsync(User user)
+        {
+            UserName = await userManager_.GetUserNameAsync(user);
+        }
+
+        public class InputModel
+        {
+            [Display(Name = "User Picture")]
+            [DataType(DataType.Upload)]
+            public IFormFile UserPicture { get; set; } = default;
         }
     }
 }

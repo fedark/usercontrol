@@ -1,10 +1,8 @@
-﻿@using Data.Db;
-
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+﻿@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
 @{
-    var isAdmin = UserManager.GetUserName(User) == AppDbContext.AdminName;
+    var isAdmin = await UserManager.IsInAdminRoleAsync(await UserManager.GetUserAsync(User));
 }
 
 <ul class="nav nav-pills flex-column">

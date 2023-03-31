@@ -1,6 +1,6 @@
 ﻿@page
 @model IndexModel
-@inject UserManager<IdentityUser> UserManager
+@inject UserManager<User> UserManager
 
 @{
     ViewData["Title"] = "Profile";
@@ -14,14 +14,14 @@
         <form id="profile-form" method="post" enctype="multipart/form-data" >
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <img src="@Url.Action("LoadUserPicture", "UserPicture", new { id = UserManager.GetUserId(Model.User) })" class="img-thumbnail img-user" />
+                <img src="@Url.Action("LoadUserPicture", "UserPicture", new { area = "", id = UserManager.GetUserId(Model.User) })" class="img-thumbnail img-user" />
             </div>
             <div>
                 <input asp-for="Input.UserPicture" accept="image/*" />
             </div>
             <div class="form-floating">
-                <input asp-for="Username" class="form-control" disabled />
-                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" disabled />
+                <label asp-for="UserName" class="form-label"></label>
             </div>
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </form>

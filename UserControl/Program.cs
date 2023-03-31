@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using UserControl.Access;
+using UserControl.Services;
 using UserControl.ViewModels.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,19 +89,19 @@ static void ConfigurePolicies(IServiceCollection services)
 {
     services.AddAuthorization(options =>
     {
-        options.AddPolicy("NotSelf", policyBuilder =>
+        options.AddPolicy(Policy.NotOnSelf, policyBuilder =>
             policyBuilder.AddRequirements(new NotOnSelfRequirement()));
     });
 
     services.AddAuthorization(options =>
     {
-        options.AddPolicy("NotPrimeAdmin", policyBuilder =>
+        options.AddPolicy(Policy.NotOnOwner, policyBuilder =>
             policyBuilder.AddRequirements(new NotOnOwnerRequirement()));
     });
 
     services.AddAuthorization(options =>
     {
-        options.AddPolicy("NotPrimeAdminUser", policyBuilder =>
+        options.AddPolicy(Policy.NotOwner, policyBuilder =>
             policyBuilder.AddRequirements(new NotOwnerRequirement()));
     });
 
