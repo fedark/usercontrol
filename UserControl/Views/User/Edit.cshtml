@@ -1,29 +1,29 @@
-﻿@model DisplayUserModel
+﻿@model UserViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit User";
 }
 
-<h1>Edit</h1>
+<h1>@ViewData["Title"]</h1>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="UserName" />
+            <input type="hidden" asp-for="@Model.Id" />
             <div>
                 <dl class="row">
                     <dt>
-                        User Name
+                        <label asp-for="@Model.UserName"></label>
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.UserName)
                     </dd>
                     <dt>
-                        Administrator
+                        <label asp-for="@Model.IsAdmin"></label>
                     </dt>
                     <dd>
-                        <input asp-for="IsAdmin" />
+                        @Html.EditorFor(m => m.IsAdmin)
                     </dd>
                 </dl>
             </div>

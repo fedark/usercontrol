@@ -1,49 +1,45 @@
-﻿@using Data.Db;
-@using Data.Services;
-
-@model IEnumerable<DisplayUserModel>
-@inject UserManager<IdentityUser> UserManager
-@inject AdminRoleManager AdminRoleManager
+﻿@model UserListViewModel
+@inject UserManager<User> UserManager
 
 @{
     ViewData["Title"] = "Users";
-    var isAdmin = User.IsInRole(AppDbContext.AdminName) || User.IsInRole(AppDbContext.PrimeAdminName);
+    var authorized = await UserManager.IsInAdminRoleAsync(await UserManager.GetUserAsync(User));
 
-    async Task<bool> allowModifyAsync(DisplayUserModel user)
+    async Task<bool> IsAllowedToModifyAsync(UserViewModel user)
     {
-        return isAdmin &&
+        return authorized &&
             UserManager.GetUserId(User) != user.Id &&
-            !(await AdminRoleManager.IsPrimeAdminAsync(user.Id));
+            !(await UserManager.IsInOwnerRoleAsync(user.Id));
     }
 }
 
-<h1>Users</h1>
+<h1>@ViewData["Title"]</h1>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                User Picture
+                <label>@Model.Headers[nameof(UserViewModel.Picture)]</label>
             </th>
             <th>
-                User Name
+                <label>@Model.Headers[nameof(UserViewModel.UserName)]</label>
             </th>
             <th>
-                Administrator
+                <label>@Model.Headers[nameof(UserViewModel.IsAdmin)]</label>
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var user in Model.Users) {
         <tr>
             <td>
-                <img src='@Url.Action("LoadUserPicture", "UserPicture", new { id = item.Id })' class="img-thumbnail img-user-small" />
+                <img src='@Url.Action("LoadUserPicture", "UserPicture", new { id = user.Id })' class="img-thumbnail img-user-small" />
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UserName)
+                @Html.DisplayFor(modelItem => user.UserName)
             </td>
-            @if (item.IsAdmin)
+            @if (user.IsAdmin)
                 {
                     <td>
                         &#x2713;
@@ -55,18 +51,18 @@
                 
                     </td>
                 }
-                @if (await allowModifyAsync(item))
+                @if (await IsAllowedToModifyAsync(user))
                 {
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <a asp-action="Details" asp-route-id="@user.Id">Details</a> |
+                        <a asp-action="Edit" asp-route-id="@user.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@user.Id">Delete</a>
                     </td>
                 }
                 else
                 {
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a asp-action="Details" asp-route-id="@user.Id">Details</a>
                     </td>
                 }
         </tr>

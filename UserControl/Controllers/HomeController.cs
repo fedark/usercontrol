@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using UserControl.Models;
+using UserControl.ViewModels;
 
 namespace UserControl.Controllers
 {

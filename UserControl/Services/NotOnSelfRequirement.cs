@@ -1,22 +1,23 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace UserControl.Access
 {
-    public class NotSelfUserRequirement : IAuthorizationRequirement
+    public class NotOnSelfRequirement : IAuthorizationRequirement
     {
     }
 
-    public class NotSelfUserHandler : AuthorizationHandler<NotSelfUserRequirement>
+    public class NotOnSelfHandler : AuthorizationHandler<NotOnSelfRequirement>
     {
-        private readonly UserManager<IdentityUser> userManager_;
+        private readonly UserManager<User> userManager_;
 
-        public NotSelfUserHandler(UserManager<IdentityUser> userManager)
+        public NotOnSelfHandler(UserManager<User> userManager)
         {
             userManager_ = userManager;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, NotSelfUserRequirement requirement)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, NotOnSelfRequirement requirement)
         {
             if (context.Resource is HttpContext httpContext)
             {
@@ -26,10 +27,6 @@ namespace UserControl.Access
                 if (id is string userId && user.Id != userId)
                 {
                     context.Succeed(requirement);
-                }
-                else
-                {
-                    context.Fail();
                 }
             }
         }

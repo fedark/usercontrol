@@ -1,17 +1,16 @@
 ﻿using Data.Db;
-using Microsoft.AspNetCore.Identity;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace UserControl.Controllers
 {
     public class UserPictureController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext context_;
 
         public UserPictureController(AppDbContext context)
         {
-            _context = context;
+            context_ = context;
         }
 
         public async Task<IActionResult> LoadUserPicture(string? id)
@@ -22,23 +21,20 @@ namespace UserControl.Controllers
                 return NotFound();
             }
 
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (userProfile is null)
-            {
-                return NotFound();
-            }
+            context_.Entry(user).Reference(u => u.UserProfile).Load();
+            var userProfile = user.UserProfile;
 
             return File(userProfile.Picture, userProfile.PictureType);
         }
 
-        private async Task<IdentityUser?> LoadUserAsync(string? id)
+        private async Task<User?> LoadUserAsync(string? id)
         {
-            if (id is null || _context.Users is null)
+            if (id is null || context_.Users is null)
             {
                 return null;
             }
 
-            return await _context.Users.FindAsync(id);
+            return await context_.Users.FindAsync(id);
         }
     }
 }

@@ -9,9 +9,6 @@ namespace Data.Db;
 
 public class AppDbContext : IdentityDbContext<User, Role, string>
 {
-    public const string AdminName = "admin";
-    public const string OwnerName = "owner";
-
     public DbSet<UserProfile> UserProfiles { get; set; } = default!;
 
     private readonly IOptions<InitialDbSettings> initSettings_;

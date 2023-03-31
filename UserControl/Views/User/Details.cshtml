@@ -1,28 +1,28 @@
-﻿@model DisplayUserModel
+﻿@model UserViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "User Details";
 }
 
-<h1>Details</h1>
+<h1>@ViewData["Title"]</h1>
 <hr />
 
 <div>
     <dl class="row">
         <dt class="col-sm-2">
-            User Picture
+            <label asp-for="@Model.UserName"></label>
         </dt>
         <dd class="col-sm-10">
             <img src="@Url.Action("LoadUserPicture", "UserPicture", new { id = Model.Id })" class="img-thumbnail img-user" />
         </dd>
         <dt class = "col-sm-2">
-            User Name
+            <label asp-for="@Model.Picture"></label>
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.UserName)
         </dd>
         <dt class="col-sm-2">
-            Administrator
+            <label asp-for="@Model.IsAdmin"></label>
         </dt>
         <dd class="col-sm-10">
             @(Model.IsAdmin ? "Yes" : "No")
