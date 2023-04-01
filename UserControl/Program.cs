@@ -12,6 +12,7 @@ using UserControl.ViewModels.MappingProfiles;
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureDatabase(builder);
+ConfigureIdentity(builder.Services);
 ConfigureMappings(builder.Services);
 
 builder.Services.AddControllersWithViews()
@@ -69,15 +70,19 @@ static void ConfigureDatabase(WebApplicationBuilder builder)
 
     builder.Services.Configure<InitialDbSettings>(builder.Configuration.GetRequiredSection(nameof(InitialDbSettings)));
 
-    builder.Services.AddIdentity<User, Role>(options =>
+    builder.Services.AddScoped<UserProfileProvider>();
+}
+
+static void ConfigureIdentity(IServiceCollection services)
+{
+    services.AddDefaultIdentity<User>(options =>
     {
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireDigit = false;
         options.Password.RequireUppercase = false;
     })
+        .AddRoles<Role>()
         .AddEntityFrameworkStores<AppDbContext>();
-
-    builder.Services.AddScoped<UserProfileProvider>();
 }
 
 static void ConfigureMappings(IServiceCollection services)

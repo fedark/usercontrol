@@ -27,7 +27,7 @@ public class AppDbContext : IdentityDbContext<User, Role, string>
         var adminRole = new Role(initSettings_.Value.AdminName);
         var ownerRole = new Role(initSettings_.Value.OwnerName);
 
-        var ownerUser = new User(initSettings_.Value.AdminName);
+        var ownerUser = new User(initSettings_.Value.OwnerName);
         var passwordHasher = new PasswordHasher<User>();
         ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, initSettings_.Value.OwnerPassword);
         
@@ -39,7 +39,7 @@ public class AppDbContext : IdentityDbContext<User, Role, string>
             entity.HasKey(p => p.UserId);
 
             entity.HasOne<User>()
-                .WithOne()
+                .WithOne(u => u.UserProfile)
                 .HasForeignKey<UserProfile>(p => p.UserId);
         });
 

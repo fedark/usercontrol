@@ -39,7 +39,7 @@ namespace UserControl.Controllers
                 return NotFound();
             }
 
-            return View(user);
+            return View(mapper_.Map<UserViewModel>(user));
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Owner}")]
@@ -61,9 +61,7 @@ namespace UserControl.Controllers
         [Authorize(Roles = $"{Role.Admin},{Role.Owner}")]
         [Authorize(Policy = Policy.NotOnSelf)]
         [Authorize(Policy = Policy.NotOnOwner)]
-        public async Task<IActionResult> Edit(
-            [Bind(nameof(UserViewModel.Id), nameof(UserViewModel.UserName), nameof(UserViewModel.IsAdmin))] 
-            UserViewModel user)
+        public async Task<IActionResult> Edit(UserViewModel user)
         {
             if (ModelState.IsValid)
             {
@@ -120,7 +118,14 @@ namespace UserControl.Controllers
                 return false;
             }
 
-            if (await userManager_.IsInAdminRoleAsync(user))
+            var isAdmin = await userManager_.IsInAdminRoleAsync(user);
+            var makeAdmin = viewUser.IsAdmin;
+            if (isAdmin == makeAdmin)
+            {
+                return true;
+            }
+
+            if (makeAdmin)
             {
                 await userManager_.AddToAdminRoleAsync(user);
             }

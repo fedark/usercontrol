@@ -23,7 +23,15 @@ public class UserProfileProvider
     private string GetDefaultPicturePath()
     {
         var staticDataDir = "static_data";
-        var contentDir = Path.Combine(Environment.CurrentDirectory, staticDataDir);
+
+        var contentDir = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)!.FullName,
+            typeof(UserProfileProvider).Assembly.GetName().Name!,
+            staticDataDir);
+
+        if (!Directory.Exists(contentDir))
+        {
+            contentDir = Path.Combine(Environment.CurrentDirectory, staticDataDir);
+        }
 
         return Path.Combine(contentDir, "no_user_picture.png");
     }

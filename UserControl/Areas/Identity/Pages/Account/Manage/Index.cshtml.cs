@@ -73,6 +73,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 if (memoryStream.Length < 4 * 1024 * 1024)
                 {
                     context_.Entry(user).Reference(u => u.UserProfile).Load();
+                    user.UserProfile.Picture = memoryStream.ToArray();
                     user.UserProfile.PictureType = Input.UserPicture.ContentType;
 
                     await userManager_.UpdateAsync(user);

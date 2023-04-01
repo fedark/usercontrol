@@ -8,8 +8,7 @@ public static class UserManagerExtensions
 {
     public static async Task<bool> IsInAdminRoleAsync<TUser>(this UserManager<TUser> userManager, TUser user) where TUser : class
     {
-        return await userManager.IsInOwnerRoleAsync(user) &&
-            await userManager.IsInRoleAsync(user, Role.Admin);
+        return await userManager.IsInRoleAsync(user, Role.Admin) || await userManager.IsInOwnerRoleAsync(user);
     }
 
     public static async Task<bool> IsInAdminRoleAsync<TUser>(this UserManager<TUser> userManager, string userId) where TUser : IdentityUser
