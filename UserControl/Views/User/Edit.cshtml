@@ -1,7 +1,8 @@
 ﻿@model UserViewModel
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Edit User";
+    ViewData["Title"] = Localizer["Title"];
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -18,7 +19,7 @@
                         <label asp-for="@Model.UserName"></label>
                     </dt>
                     <dd>
-                        @Html.DisplayFor(model => model.UserName)
+                        @Model.UserName
                     </dd>
                     <dt>
                         <label asp-for="@Model.IsAdmin"></label>
@@ -29,14 +30,14 @@
                 </dl>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">@Localizer["Back"]</a>
 </div>
 
 @section Scripts {

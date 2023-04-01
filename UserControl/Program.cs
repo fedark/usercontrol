@@ -16,8 +16,7 @@ ConfigureIdentity(builder.Services);
 ConfigureMappings(builder.Services);
 
 builder.Services.AddControllersWithViews()
-    .AddMvcLocalization();
-
+    .AddMvcLocalization(options => options.ResourcesPath = "Resources");
 
 ConfigurePolicies(builder.Services);
 
@@ -27,6 +26,16 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
+
+app.UseRequestLocalization(options =>
+{
+    var supportedCultures = new CultureInfo[] { new("en"), new("ru") };
+
+    options.DefaultRequestCulture = new RequestCulture("en");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
 app.UseStaticFiles();
 
 app.UseRouting();

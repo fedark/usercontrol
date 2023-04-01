@@ -6,10 +6,10 @@ public class UserViewModel
 {
     public string Id { get; set; } = default!;
 
-    [Display(Name = "User Name")]
+    [Display(Name = "UserName")]
     public string UserName { get; set; } = default!;
 
-    [Display(Name = "User Picture")]
+    [Display(Name = "UserPicture")]
     public byte[]? Picture { get; set; } = default!;
 
     public string? PictureType { get; set; } = default!;
