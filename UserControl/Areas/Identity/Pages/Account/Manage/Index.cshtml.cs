@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
 {
@@ -18,7 +19,9 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         private readonly SignInManager<User> signInManager_;
         private readonly AppDbContext context_;
         private readonly UserProfileProvider userProfileProvider_;
+        private readonly IStringLocalizer<IndexModel> localizer_;
 
+        [Display(Name = "UserName")]
         public string UserName { get; set; } = default!;
 
         [TempData]
@@ -31,12 +34,14 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             AppDbContext context,
-            UserProfileProvider userProfileProvider)
+            UserProfileProvider userProfileProvider,
+            IStringLocalizer<IndexModel> localizer)
         {
             userManager_ = userManager;
             signInManager_ = signInManager;
             context_ = context;
             userProfileProvider_ = userProfileProvider;
+            localizer_ = localizer;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -44,7 +49,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var user = await userManager_.GetUserAsync(User);
             if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
+                return NotFound(localizer_["UserNotFound", userManager_.GetUserId(User)]);
             }
 
             await LoadAsync(user);
@@ -56,7 +61,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var user = await userManager_.GetUserAsync(User);
             if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
+                return NotFound(localizer_["UserNotFound", userManager_.GetUserId(User)]);
             }
 
             if (!ModelState.IsValid)
@@ -80,13 +85,13 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 }
                 else
                 {
-                    StatusMessage = "The user picture must be less than 4MB.";
+                    StatusMessage = localizer_["PictureSizeMessage"];
                     return RedirectToPage();
                 }
             }
 
             await signInManager_.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = localizer_["ProfileUpdated"];
 
             return RedirectToPage();
         }
@@ -96,7 +101,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var user = await userManager_.GetUserAsync(User);
             if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
+                return NotFound(localizer_["UserNotFound", userManager_.GetUserId(User)]);
             }
 
             var defaultProfile = await userProfileProvider_.GetDefaultProfileAsync(user.Id);
@@ -115,7 +120,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             await context_.SaveChangesAsync();
 
             await signInManager_.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = localizer_["ProfileUpdated"];
 
             return RedirectToPage();
         }
@@ -127,9 +132,9 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Display(Name = "User Picture")]
+            [Display(Name = "UserPicture")]
             [DataType(DataType.Upload)]
-            public IFormFile UserPicture { get; set; } = default;
+            public IFormFile UserPicture { get; set; } = default!;
         }
     }
 }

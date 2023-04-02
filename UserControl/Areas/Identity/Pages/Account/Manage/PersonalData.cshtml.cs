@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
@@ -14,10 +15,13 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
     public class PersonalDataModel : PageModel
     {
         private readonly UserManager<User> userManager_;
+        private readonly IStringLocalizer<PersonalDataModel> localizer_;
 
-        public PersonalDataModel(UserManager<User> userManager)
+        public PersonalDataModel(UserManager<User> userManager,
+            IStringLocalizer<PersonalDataModel> localizer)
         {
             userManager_ = userManager;
+            localizer_ = localizer;
         }
 
         public async Task<IActionResult> OnGet()
@@ -25,7 +29,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var user = await userManager_.GetUserAsync(User);
             if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
+                return NotFound(localizer_["UserNotFound", userManager_.GetUserId(User)]);
             }
 
             return Page();

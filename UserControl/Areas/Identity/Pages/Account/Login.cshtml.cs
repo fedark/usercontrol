@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 
 namespace UserControl.Areas.Identity.Pages.Account
 {
@@ -14,6 +15,7 @@ namespace UserControl.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<User> signInManager_;
         private readonly ILogger<LoginModel> logger_;
+        private readonly IStringLocalizer<LoginModel> localizer_;
 
         [BindProperty]
         public InputModel Input { get; set; } = default!;
@@ -25,10 +27,13 @@ namespace UserControl.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; } = default!;
 
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<User> signInManager,
+            ILogger<LoginModel> logger,
+            IStringLocalizer<LoginModel> localizer)
         {
             signInManager_ = signInManager;
             logger_ = logger;
+            localizer_ = localizer;
         }
 
         public async Task OnGetAsync(string? returnUrl = default)
@@ -64,7 +69,7 @@ namespace UserControl.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, localizer_["InvalidLoginAttempt"]);
                     return Page();
                 }
             }
@@ -76,14 +81,15 @@ namespace UserControl.Areas.Identity.Pages.Account
         {
             [Required]
             [DataType(DataType.Text)]
-            [Display(Name = "User Name")]
+            [Display(Name = "UserName")]
             public string UserName { get; set; } = default!;
 
             [Required]
             [DataType(DataType.Password)]
+            [Display(Name = "Password")]
             public string Password { get; set; } = default!;
 
-            [Display(Name = "Remember me?")]
+            [Display(Name = "RememberMe")]
             public bool RememberMe { get; set; }
         }
     }

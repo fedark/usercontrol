@@ -1,14 +1,16 @@
 ﻿@page
 @model IndexModel
 @inject UserManager<User> UserManager
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = Localizer["Profile"];
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <div class="row">
     <div class="col-md-6">
         <form id="profile-form" method="post" enctype="multipart/form-data" >
@@ -23,10 +25,10 @@
                 <input asp-for="UserName" class="form-control" disabled />
                 <label asp-for="UserName" class="form-label"></label>
             </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">@Localizer["Save"]</button>
         </form>
         <form id="delete-picture" asp-page-handler="DeletePicture" method="post">
-            <button id="delete-picture-button" class="btn btn-danger" type="submit">Delete Picture</button>
+            <button id="delete-picture-button" class="btn btn-danger" type="submit">@Localizer["DeletePicture"]</button>
         </form>
     </div>
 </div>

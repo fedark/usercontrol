@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 using UserControl.Services;
 
 namespace UserControl.Areas.Identity.Pages.Account.Manage
@@ -17,6 +18,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<User> userManager_;
         private readonly SignInManager<User> signInManager_;
         private readonly ILogger<DeletePersonalDataModel> logger_;
+        private readonly IStringLocalizer<DeletePersonalDataModel> localizer_;
 
         [BindProperty]
         public InputModel Input { get; set; } = default!;
@@ -26,11 +28,13 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         public DeletePersonalDataModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
+            ILogger<DeletePersonalDataModel> logger,
+            IStringLocalizer<DeletePersonalDataModel> localizer)
         {
             userManager_ = userManager;
             signInManager_ = signInManager;
             logger_ = logger;
+            localizer_ = localizer;
         }
 
         public async Task<IActionResult> OnGet()
@@ -38,7 +42,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var user = await userManager_.GetUserAsync(User);
             if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
+                return NotFound(localizer_["UserNotFound", userManager_.GetUserId(User)]);
             }
 
             RequirePassword = await userManager_.HasPasswordAsync(user);
@@ -50,7 +54,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var user = await userManager_.GetUserAsync(User);
             if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{userManager_.GetUserId(User)}'.");
+                return NotFound(localizer_["UserNotFound", userManager_.GetUserId(User)]);
             }
 
             RequirePassword = await userManager_.HasPasswordAsync(user);
@@ -58,7 +62,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             {
                 if (!await userManager_.CheckPasswordAsync(user, Input.Password))
                 {
-                    ModelState.AddModelError(string.Empty, "Incorrect password.");
+                    ModelState.AddModelError(string.Empty, localizer_["IncorrectPassword"]);
                     return Page();
                 }
             }
@@ -67,7 +71,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
             var userId = await userManager_.GetUserIdAsync(user);
             if (!result.Succeeded)
             {
-                throw new InvalidOperationException($"Unexpected error occurred deleting user.");
+                throw new InvalidOperationException(localizer_["DeleteError"]);
             }
 
             await signInManager_.SignOutAsync();
@@ -81,6 +85,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         {
             [Required]
             [DataType(DataType.Password)]
+            [Display(Name = "Password")]
             public string Password { get; set; } = default!;
         }
     }
