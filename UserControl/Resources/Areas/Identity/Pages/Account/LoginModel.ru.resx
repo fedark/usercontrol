@@ -120,13 +120,4 @@
   <data name="InvalidLoginAttempt" xml:space="preserve">
     <value>Неудачная попытка входа.</value>
   </data>
-  <data name="Password" xml:space="preserve">
-    <value>Пароль</value>
-  </data>
-  <data name="RememberMe" xml:space="preserve">
-    <value>Запомнить меня?</value>
-  </data>
-  <data name="UserName" xml:space="preserve">
-    <value>Имя пользователя</value>
-  </data>
 </root>

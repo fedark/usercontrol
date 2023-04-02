@@ -123,9 +123,6 @@
   <data name="IncorrectPassword" xml:space="preserve">
     <value>Incorrect password.</value>
   </data>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
-  </data>
   <data name="UserNotFound" xml:space="preserve">
     <value>Unable to load user with ID '{0}'.</value>
   </data>

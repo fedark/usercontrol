@@ -120,13 +120,4 @@
   <data name="InvalidLoginAttempt" xml:space="preserve">
     <value>Invalid login attempt.</value>
   </data>
-  <data name="Password" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="RememberMe" xml:space="preserve">
-    <value>RememberMe?</value>
-  </data>
-  <data name="UserName" xml:space="preserve">
-    <value>User Name</value>
-  </data>
 </root>

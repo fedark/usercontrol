@@ -129,7 +129,4 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>Unable to load user with ID '{0}'.</value>
   </data>
-  <data name="UserPicture" xml:space="preserve">
-    <value>User Picture</value>
-  </data>
 </root>

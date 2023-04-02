@@ -117,13 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DeleteError" xml:space="preserve">
-    <value>Ошибка при удалении пользователя.</value>
-  </data>
-  <data name="IncorrectPassword" xml:space="preserve">
-    <value>Неправильный пароль</value>
-  </data>
-  <data name="UserNotFound" xml:space="preserve">
-    <value>Ошибка загрузки пользователя с ID '{0}'.</value>
+  <data name="Password" xml:space="preserve">
+    <value>Пароль</value>
   </data>
 </root>

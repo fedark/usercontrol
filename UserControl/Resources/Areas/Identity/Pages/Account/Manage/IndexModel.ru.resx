@@ -129,7 +129,4 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>Ошибка загрузки пользователя с ID '{0}'.</value>
   </data>
-  <data name="UserPicture" xml:space="preserve">
-    <value>Фото профиля</value>
-  </data>
 </root>
