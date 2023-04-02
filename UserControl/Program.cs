@@ -5,14 +5,16 @@ using Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using UserControl.Access;
+using UserControl.Localization;
 using UserControl.Services;
 using UserControl.ViewModels.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureDatabase(builder);
-ConfigureIdentity(builder.Services);
+ConfigureDatabase(builder.Services, builder.Configuration);
+ConfigureIdentity(builder.Services, builder.Configuration);
 ConfigureMappings(builder.Services);
 
 builder.Services.AddControllersWithViews()
@@ -29,9 +31,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseRequestLocalization(options =>
 {
-    var supportedCultures = new CultureInfo[] { new("en"), new("ru") };
+    var localizationOptions = app.Services.GetRequiredService<IOptions<LocalizationOptions>>();
+    var supportedCultures = localizationOptions.Value.SupportedCultures.Select(c => new CultureInfo(c)).ToList();
 
-    options.DefaultRequestCulture = new RequestCulture("en");
+    options.DefaultRequestCulture = new RequestCulture(localizationOptions.Value.DefaultCulture);
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
 });
@@ -49,40 +52,40 @@ app.MapDefaultControllerRoute();
 
 app.Run();
 
-static void ConfigureDatabase(WebApplicationBuilder builder)
+static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
 {
-    if (!Enum.TryParse<AppDbProvider>(builder.Configuration.GetValue("DbProvider", nameof(AppDbProvider.SqlServer)), out var provider))
+    if (!Enum.TryParse<AppDbProvider>(configuration.GetValue("DbProvider", nameof(AppDbProvider.SqlServer)), out var provider))
     {
         provider = AppDbProvider.SqlServer;
     }
 
-    var connectionString = builder.Configuration.GetConnectionString("Default");
+    var connectionString = configuration.GetConnectionString("Default");
 
-    builder.Services.AddDbContext<AppDbContext>(options =>
+    services.AddDbContext<AppDbContext>(options =>
     {
         _ = provider switch
         {
-            AppDbProvider.SqlServer => options.UseSqlServer(connectionString ??= builder.Configuration.GetConnectionString("UserControlLocalDB"),
+            AppDbProvider.SqlServer => options.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlLocalDB"),
                 b => b.MigrationsAssembly("Data.SqlServerMigrations")),
-            AppDbProvider.PostgreSql => options.UseNpgsql(connectionString ??= builder.Configuration.GetConnectionString("UserControlPostgreSqlDB"),
+            AppDbProvider.PostgreSql => options.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlPostgreSqlDB"),
                 b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
-            AppDbProvider.Sqlite => options.UseSqlite(connectionString ??= builder.Configuration.GetConnectionString("UserControlSqliteDB"),
+            AppDbProvider.Sqlite => options.UseSqlite(connectionString ??= configuration.GetConnectionString("UserControlSqliteDB"),
                 b => b.MigrationsAssembly("Data.SqliteMigrations")),
-            AppDbProvider.ContainerSqlServer => options.UseSqlServer(connectionString ??= builder.Configuration.GetConnectionString("UserControlContainerSqlServerDB"),
+            AppDbProvider.ContainerSqlServer => options.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlContainerSqlServerDB"),
                 b => b.MigrationsAssembly("Data.SqlServerMigrations")),
-            AppDbProvider.ContainerPostgreSql => options.UseNpgsql(connectionString ??= builder.Configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
+            AppDbProvider.ContainerPostgreSql => options.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
                 b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
 
             _ => throw new Exception($"Database provider '{provider}' is not supported")
         };
     });
 
-    builder.Services.Configure<InitialDbSettings>(builder.Configuration.GetRequiredSection(nameof(InitialDbSettings)));
+    services.Configure<InitialDbSettings>(configuration.GetRequiredSection(nameof(InitialDbSettings)));
 
-    builder.Services.AddScoped<UserProfileProvider>();
+    services.AddScoped<UserProfileProvider>();
 }
 
-static void ConfigureIdentity(IServiceCollection services)
+static void ConfigureIdentity(IServiceCollection services, IConfiguration configuration)
 {
     services.AddDefaultIdentity<User>(options =>
     {
@@ -91,7 +94,11 @@ static void ConfigureIdentity(IServiceCollection services)
         options.Password.RequireUppercase = false;
     })
         .AddRoles<Role>()
-        .AddEntityFrameworkStores<AppDbContext>();
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
+
+    services.Configure<LocalizationOptions>(configuration.GetRequiredSection("LocalizationOptions"));
+    services.AddSingleton<IIdentityErrorDescriberFactory, IdentityErrorDescriberFactory>();
 }
 
 static void ConfigureMappings(IServiceCollection services)
