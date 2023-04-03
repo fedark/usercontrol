@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services;
+namespace Data.Infrastructure.Services;
 
 public static class UserManagerExtensions
 {

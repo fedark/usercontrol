@@ -1,5 +1,5 @@
-﻿namespace Data.Db;
-public class InitialDbSettings
+﻿namespace Data.Infrastructure.Services;
+public class UserSeedOptions
 {
     public string AdminName { get; set; } = default!;
     public string OwnerName { get; set; } = default!;

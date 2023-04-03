@@ -1,6 +1,6 @@
 ﻿using Data.Models;
 
-namespace Data.Services;
+namespace Data.Infrastructure.Services;
 
 public class UserProfileProvider
 {

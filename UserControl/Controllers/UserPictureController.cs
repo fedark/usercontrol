@@ -1,40 +1,30 @@
-﻿using Data.Db;
-using Data.Models;
+﻿using Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserControl.Controllers
 {
     public class UserPictureController : Controller
     {
-        private readonly AppDbContext context_;
+        private readonly UserManager<User> userManager_;
 
-        public UserPictureController(AppDbContext context)
+        public UserPictureController(UserManager<User> userManager)
         {
-            context_ = context;
+            userManager_ = userManager;
         }
 
         public async Task<IActionResult> LoadUserPicture(string? id)
         {
-            var user = await LoadUserAsync(id);
+            var user = await userManager_.Users.Where(u => u.Id == id).Include(u => u.UserProfile).FirstOrDefaultAsync();
             if (user is null)
             {
                 return NotFound();
             }
 
-            context_.Entry(user).Reference(u => u.UserProfile).Load();
             var userProfile = user.UserProfile;
 
             return File(userProfile.Picture, userProfile.PictureType);
-        }
-
-        private async Task<User?> LoadUserAsync(string? id)
-        {
-            if (id is null || context_.Users is null)
-            {
-                return null;
-            }
-
-            return await context_.Users.FindAsync(id);
         }
     }
 }

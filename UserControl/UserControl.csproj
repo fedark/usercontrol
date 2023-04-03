@@ -21,10 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Data.PostgreSqlMigrations\Data.PostgreSqlMigrations.csproj" />
-    <ProjectReference Include="..\Data.SqliteMigrations\Data.SqliteMigrations.csproj" />
-    <ProjectReference Include="..\Data.SqlServerMigrations\Data.SqlServerMigrations.csproj" />
+    <ProjectReference Include="..\Data.Infrastructure\Data.Infrastructure.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Ef.PostgreSqlMigrations\Ef.PostgreSqlMigrations.csproj" />
+    <ProjectReference Include="..\Ef.SqliteMigrations\Ef.SqliteMigrations.csproj" />
+    <ProjectReference Include="..\Ef.SqlServerMigrations\Ef.SqlServerMigrations.csproj" />
+    <ProjectReference Include="..\Ef\Ef.csproj" />
   </ItemGroup>
 
 </Project>

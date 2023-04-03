@@ -1,22 +1,22 @@
-﻿using Data.Models;
-using Data.Services;
+﻿using Data.Infrastructure.Services;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Data.Db;
+namespace Ef.Db;
 
-public class AppDbContext : IdentityDbContext<User, Role, string>
+public class EfDbContext : IdentityDbContext<User, Role, string>
 {
     public DbSet<UserProfile> UserProfiles { get; set; } = default!;
 
-    private readonly IOptions<InitialDbSettings> initSettings_;
+    private readonly UserSeedOptions seedOptions_;
     private readonly UserProfileProvider userProfileProvider_;
 
-    public AppDbContext(DbContextOptions options, IOptions<InitialDbSettings> initSettings, UserProfileProvider userProfileProvider) : base(options)
+    public EfDbContext(DbContextOptions options, IOptions<UserSeedOptions> seedOptions, UserProfileProvider userProfileProvider) : base(options)
     {
-        initSettings_ = initSettings;
+        seedOptions_ = seedOptions.Value;
         userProfileProvider_ = userProfileProvider;
     }
 
@@ -24,12 +24,12 @@ public class AppDbContext : IdentityDbContext<User, Role, string>
     {
         base.OnModelCreating(builder);
 
-        var adminRole = new Role(initSettings_.Value.AdminName);
-        var ownerRole = new Role(initSettings_.Value.OwnerName);
+        var adminRole = new Role(seedOptions_.AdminName);
+        var ownerRole = new Role(seedOptions_.OwnerName);
 
-        var ownerUser = new User(initSettings_.Value.OwnerName);
+        var ownerUser = new User(seedOptions_.OwnerName);
         var passwordHasher = new PasswordHasher<User>();
-        ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, initSettings_.Value.OwnerPassword);
+        ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, seedOptions_.OwnerPassword);
 
         var ownerUserRole = new IdentityUserRole<string> { RoleId = ownerRole.Id, UserId = ownerUser.Id };
         var ownerProfile = userProfileProvider_.GetDefaultProfile(ownerUser.Id);

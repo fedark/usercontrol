@@ -1,7 +1,9 @@
 using System.Globalization;
-using Data.Db;
+using Data.Infrastructure.Abstractions;
+using Data.Infrastructure.Services;
 using Data.Models;
-using Data.Services;
+using Ef.Db;
+using Ef.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -59,34 +61,36 @@ app.Run();
 
 static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
 {
-    if (!Enum.TryParse<AppDbProvider>(configuration.GetValue("DbProvider", nameof(AppDbProvider.SqlServer)), out var provider))
+    if (!Enum.TryParse<EfDbProvider>(configuration.GetValue("DbProvider", nameof(EfDbProvider.SqlServer)), out var provider))
     {
-        provider = AppDbProvider.SqlServer;
+        provider = EfDbProvider.SqlServer;
     }
 
     var connectionString = configuration.GetConnectionString("Default");
 
-    services.AddDbContext<AppDbContext>(options =>
+    var dbOptionsAction = (DbContextOptionsBuilder dbOptions) =>
     {
         _ = provider switch
         {
-            AppDbProvider.SqlServer => options.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlLocalDB"),
+            EfDbProvider.SqlServer => dbOptions.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlLocalDB"),
                 b => b.MigrationsAssembly("Data.SqlServerMigrations")),
-            AppDbProvider.PostgreSql => options.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlPostgreSqlDB"),
+            EfDbProvider.PostgreSql => dbOptions.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlPostgreSqlDB"),
                 b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
-            AppDbProvider.Sqlite => options.UseSqlite(connectionString ??= configuration.GetConnectionString("UserControlSqliteDB"),
+            EfDbProvider.Sqlite => dbOptions.UseSqlite(connectionString ??= configuration.GetConnectionString("UserControlSqliteDB"),
                 b => b.MigrationsAssembly("Data.SqliteMigrations")),
-            AppDbProvider.ContainerSqlServer => options.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlContainerSqlServerDB"),
+            EfDbProvider.ContainerSqlServer => dbOptions.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlContainerSqlServerDB"),
                 b => b.MigrationsAssembly("Data.SqlServerMigrations")),
-            AppDbProvider.ContainerPostgreSql => options.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
+            EfDbProvider.ContainerPostgreSql => dbOptions.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
                 b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
 
             _ => throw new Exception($"Database provider '{provider}' is not supported")
         };
-    });
+    };
 
-    services.Configure<InitialDbSettings>(configuration.GetRequiredSection(nameof(InitialDbSettings)));
+    services.AddScoped<IDataContext, EfDataContext>();
+    services.AddDbContext<EfDbContext>(dbOptionsAction);
 
+    services.Configure<UserSeedOptions>(configuration.GetRequiredSection(nameof(UserSeedOptions)));
     services.AddScoped<UserProfileProvider>();
 }
 
@@ -99,7 +103,7 @@ static void ConfigureIdentity(IServiceCollection services, IConfiguration config
         options.Password.RequireUppercase = false;
     })
         .AddRoles<Role>()
-        .AddEntityFrameworkStores<AppDbContext>()
+        .AddEntityFrameworkStores<EfDbContext>()
         .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
 
     services.Configure<LocalizationOptions>(configuration.GetRequiredSection("LocalizationOptions"));

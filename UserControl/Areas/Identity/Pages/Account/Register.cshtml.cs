@@ -2,13 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.ComponentModel.DataAnnotations;
-using Data.Db;
 using Data.Models;
-using Data.Services;
+using Data.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Data.Infrastructure.Abstractions;
 
 namespace UserControl.Areas.Identity.Pages.Account
 {
@@ -17,7 +17,7 @@ namespace UserControl.Areas.Identity.Pages.Account
         private readonly SignInManager<User> signInManager_;
         private readonly UserManager<User> userManager_;
         private readonly ILogger<RegisterModel> logger_;
-        private readonly AppDbContext context_;
+        private readonly IDataContext context_;
         private readonly UserProfileProvider userProfileProvider_;
 
         [BindProperty]
@@ -31,7 +31,7 @@ namespace UserControl.Areas.Identity.Pages.Account
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            AppDbContext context,
+            IDataContext context,
             UserProfileProvider userProfileProvider)
         {
             userManager_ = userManager;

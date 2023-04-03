@@ -2,9 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.ComponentModel.DataAnnotations;
-using Data.Db;
+using Data.Infrastructure.Abstractions;
+using Data.Infrastructure.Services;
 using Data.Models;
-using Data.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,7 +17,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<User> userManager_;
         private readonly SignInManager<User> signInManager_;
-        private readonly AppDbContext context_;
+        private readonly IDataContext context_;
         private readonly UserProfileProvider userProfileProvider_;
         private readonly IStringLocalizer<IndexModel> localizer_;
 
@@ -33,7 +33,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         public IndexModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            AppDbContext context,
+            IDataContext context,
             UserProfileProvider userProfileProvider,
             IStringLocalizer<IndexModel> localizer)
         {
@@ -77,11 +77,11 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
 
                 if (memoryStream.Length < 4 * 1024 * 1024)
                 {
-                    context_.Entry(user).Reference(u => u.UserProfile).Load();
-                    user.UserProfile.Picture = memoryStream.ToArray();
-                    user.UserProfile.PictureType = Input.UserPicture.ContentType;
+                    var userWithNavigation = await userManager_.Users.Where(u => u.Id == user.Id).Include(u => u.UserProfile).SingleAsync();
+                    userWithNavigation.UserProfile.Picture = memoryStream.ToArray();
+                    userWithNavigation.UserProfile.PictureType = Input.UserPicture.ContentType;
 
-                    await userManager_.UpdateAsync(user);
+                    await userManager_.UpdateAsync(userWithNavigation);
                 }
                 else
                 {

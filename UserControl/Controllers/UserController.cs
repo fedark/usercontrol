@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Data.Models;
-using Data.Services;
+using Data.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

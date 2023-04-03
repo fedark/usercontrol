@@ -1,5 +1,5 @@
 ﻿using Data.Models;
-using Data.Services;
+using Data.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 

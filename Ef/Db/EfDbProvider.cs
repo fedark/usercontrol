@@ -1,6 +1,6 @@
-﻿namespace Data.Db;
+﻿namespace Ef.Db;
 
-public enum AppDbProvider
+public enum EfDbProvider
 {
     SqlServer,
     PostgreSql,
