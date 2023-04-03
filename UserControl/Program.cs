@@ -20,6 +20,19 @@ ConfigureMappings(builder.Services);
 builder.Services.AddControllersWithViews()
     .AddMvcLocalization(options => options.ResourcesPath = "Resources");
 
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var localizationOptions = builder.Configuration.GetRequiredSection("LocalizationOptions");
+    var defaultCulture = localizationOptions["DefaultCulture"] ?? throw new Exception("Default culture is not configured.");
+
+    var supportedCultures = localizationOptions.GetRequiredSection("SupportedCultures").Get<string[]>()
+        .Select(c => new CultureInfo(c)).ToList();
+
+    options.DefaultRequestCulture = new RequestCulture(defaultCulture);
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
 ConfigurePolicies(builder.Services);
 
 var app = builder.Build();
@@ -29,15 +42,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 
-app.UseRequestLocalization(options =>
-{
-    var localizationOptions = app.Services.GetRequiredService<IOptions<LocalizationOptions>>();
-    var supportedCultures = localizationOptions.Value.SupportedCultures.Select(c => new CultureInfo(c)).ToList();
-
-    options.DefaultRequestCulture = new RequestCulture(localizationOptions.Value.DefaultCulture);
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
-});
+app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
 app.UseStaticFiles();
 
