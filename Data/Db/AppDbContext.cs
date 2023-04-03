@@ -30,7 +30,7 @@ public class AppDbContext : IdentityDbContext<User, Role, string>
         var ownerUser = new User(initSettings_.Value.OwnerName);
         var passwordHasher = new PasswordHasher<User>();
         ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, initSettings_.Value.OwnerPassword);
-        
+
         var ownerUserRole = new IdentityUserRole<string> { RoleId = ownerRole.Id, UserId = ownerUser.Id };
         var ownerProfile = userProfileProvider_.GetDefaultProfile(ownerUser.Id);
 
