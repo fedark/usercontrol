@@ -26,3 +26,8 @@ body {
     max-width: 7rem;
     max-height: 7rem;
 }
+
+.symbol {
+    font-weight: 700;
+    font-size: 1.2rem;
+}

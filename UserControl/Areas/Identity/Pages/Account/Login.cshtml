@@ -1,8 +1,9 @@
 ﻿@page
 @model LoginModel
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = Localizer["Login"];
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -10,7 +11,6 @@
     <div class="col-md-4">
         <section>
             <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-floating">
@@ -24,7 +24,7 @@
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
                 <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">@Localizer["Login"]</button>
                 </div>
             </form>
         </section>

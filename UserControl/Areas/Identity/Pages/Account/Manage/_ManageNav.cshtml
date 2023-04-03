@@ -1,16 +1,15 @@
-﻿@using Data.Db;
-
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+﻿@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@inject IViewLocalizer Localizer
 
 @{
-    var isAdmin = UserManager.GetUserName(User) == AppDbContext.AdminName;
+    var isOwner = await UserManager.IsInOwnerRoleAsync(await UserManager.GetUserAsync(User));
 }
 
 <ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    @if (!isAdmin)
+    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">@Localizer["Profile"]</a></li>
+    @if (!isOwner)
     {
-        <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
+        <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">@Localizer["PersonalData"]</a></li>
     }
 </ul>

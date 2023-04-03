@@ -1,41 +1,43 @@
-﻿@model DisplayUserModel
+﻿@model UserViewModel
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = Localizer["Title"];
 }
 
-<h1>Edit</h1>
+<h1>@ViewData["Title"]</h1>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="UserName" />
+            <input type="hidden" asp-for="@Model.Id" />
+            <input type="hidden" asp-for="@Model.UserName" />
             <div>
                 <dl class="row">
                     <dt>
-                        User Name
+                        <label asp-for="@Model.UserName"></label>
                     </dt>
                     <dd>
-                        @Html.DisplayFor(model => model.UserName)
+                        @Model.UserName
                     </dd>
                     <dt>
-                        Administrator
+                        <label asp-for="@Model.IsAdmin"></label>
                     </dt>
                     <dd>
-                        <input asp-for="IsAdmin" />
+                        @Html.EditorFor(m => m.IsAdmin)
                     </dd>
                 </dl>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">@Localizer["Back"]</a>
 </div>
 
 @section Scripts {

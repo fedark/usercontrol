@@ -1,73 +1,71 @@
-﻿using Data.Db;
+﻿using AutoMapper;
+using Data.Models;
 using Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using UserControl.Models;
+using UserControl.Services;
+using UserControl.ViewModels;
 
 namespace UserControl.Controllers
 {
     [Authorize]
-    public partial class UserController : Controller
+    public class UserController : Controller
     {
-        private readonly AppDbContext _context;
-        private readonly RoleManager<IdentityRole> roleManager_;
-        private readonly AdminRoleManager adminRoleManager_;
+        private readonly UserManager<User> userManager_;
+        private readonly IMapper mapper_;
 
-        public UserController(AppDbContext context, RoleManager<IdentityRole> roleManager, AdminRoleManager adminRoleManager)
+        public UserController(UserManager<User> userManager,
+            IMapper mapper)
         {
-            _context = context;
-            roleManager_ = roleManager;
-            adminRoleManager_ = adminRoleManager;
+            userManager_ = userManager;
+            mapper_ = mapper;
         }
 
         public async Task<IActionResult> Index()
         {
-            var users = await _context.Users.ToListAsync();
-            return View(await LoadUsersAsync(users));
+            var users = await userManager_.Users.ToListAsync();
+            var viewUsers = mapper_.Map<IEnumerable<UserViewModel>>(users);
+
+            return View(new UserListViewModel(viewUsers));
         }
 
         public async Task<IActionResult> Details(string? id)
         {
-            var user = await LoadUserAsync(id);
+            var user = await GetUserAsync(id);
             if (user is null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(mapper_.Map<UserViewModel>(user));
         }
 
-        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
-        [Authorize(Policy = "NotSelf")]
-        [Authorize(Policy = "NotPrimeAdmin")]
+        [Authorize(Roles = $"{Role.Admin},{Role.Owner}")]
+        [Authorize(Policy = Policy.NotOnSelf)]
+        [Authorize(Policy = Policy.NotOnOwner)]
         public async Task<IActionResult> Edit(string? id)
         {
-            var user = await LoadUserAsync(id);
+            var user = await GetUserAsync(id);
             if (user is null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(mapper_.Map<UserViewModel>(user));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
-        [Authorize(Policy = "NotSelf")]
-        [Authorize(Policy = "NotPrimeAdmin")]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,IsAdmin")] DisplayUserModel user)
+        [Authorize(Roles = $"{Role.Admin},{Role.Owner}")]
+        [Authorize(Policy = Policy.NotOnSelf)]
+        [Authorize(Policy = Policy.NotOnOwner)]
+        public async Task<IActionResult> Edit(UserViewModel user)
         {
-            if (id != user.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                if (await TryChangeRoleAsync(id, user.IsAdmin))
+                if (await TryChangeRoleAsync(user))
                 {
                     return RedirectToAction(nameof(Index));
                 }
@@ -80,114 +78,73 @@ namespace UserControl.Controllers
             return View(user);
         }
 
-        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
-        [Authorize(Policy = "NotSelf")]
-        [Authorize(Policy = "NotPrimeAdmin")]
+        [Authorize(Roles = $"{Role.Admin},{Role.Owner}")]
+        [Authorize(Policy = Policy.NotOnSelf)]
+        [Authorize(Policy = Policy.NotOnOwner)]
         public async Task<IActionResult> Delete(string? id)
         {
-            var user = await LoadUserAsync(id);
+            var user = await GetUserAsync(id);
             if (user is null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(mapper_.Map<UserViewModel>(user));
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = $"{AppDbContext.AdminName},{AppDbContext.PrimeAdminName}")]
-        [Authorize(Policy = "NotSelf")]
-        [Authorize(Policy = "NotPrimeAdmin")]
+        [Authorize(Roles = $"{Role.Admin},{Role.Owner}")]
+        [Authorize(Policy = Policy.NotOnSelf)]
+        [Authorize(Policy = Policy.NotOnOwner)]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Users is null)
+            var user = await GetUserAsync(id);
+            if (user is null)
             {
-                return Problem($"Entity set {nameof(_context.Users)} is null.");
+                return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user is not null)
-            {
-                _context.Users.Remove(user);
-            }
+            await userManager_.DeleteAsync(user);
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<bool> TryChangeRoleAsync(string? id, bool makeAdmin)
+        private async Task<bool> TryChangeRoleAsync(UserViewModel viewUser)
         {
-            var user = await LoadUserAsync(id);
+            var user = await GetUserAsync(viewUser.Id);
             if (user is null)
             {
                 return false;
             }
 
-            var adminRole = await roleManager_.FindByNameAsync(AppDbContext.AdminName);
-            if (!user.IsAdmin && makeAdmin)
+            var isAdmin = await userManager_.IsInAdminRoleAsync(user);
+            var makeAdmin = viewUser.IsAdmin;
+            if (isAdmin == makeAdmin)
             {
-                await _context.UserRoles.AddAsync(new() { UserId = user.Id, RoleId = adminRole.Id });
-            }
-            else if (user.IsAdmin && !makeAdmin)
-            {
-                var userRole = await _context.UserRoles.FindAsync(user.Id, adminRole.Id);
-                if (userRole is not null)
-                {
-                    _context.UserRoles.Remove(userRole);
-                }
+                return true;
             }
 
-            await _context.SaveChangesAsync();
+            if (makeAdmin)
+            {
+                await userManager_.AddToAdminRoleAsync(user);
+            }
+            else
+            {
+                await userManager_.RemoveFromAdminRoleAsync(user);
+            }
+
             return true;
         }
 
-        private async Task<DisplayUserModel?> LoadUserAsync(string? id)
+        private async Task<User?> GetUserAsync(string? id)
         {
-            if (id is null || _context.Users is null)
+            if (id is null)
             {
                 return null;
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user is null)
-            {
-                return null;
-            }
-
-            return await LoadUserAsync(user);
-        }
-
-        private async Task<DisplayUserModel> LoadUserAsync(IdentityUser user)
-        {
-            var isAdmin = await adminRoleManager_.IsAdminAsync(user.Id);
-            var displayUser = new DisplayUserModel
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                IsAdmin = isAdmin
-            };
-
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (userProfile is not null)
-            {
-                displayUser.Picture = userProfile.Picture;
-                displayUser.PictureType = userProfile.PictureType;
-            }
-
-            return displayUser;
-        }
-
-        private async Task<IEnumerable<DisplayUserModel>> LoadUsersAsync(IEnumerable<IdentityUser> users)
-        {
-            var result = new List<DisplayUserModel>();
-
-            foreach (var user in users)
-            {
-                result.Add(await LoadUserAsync(user));
-            }
-
-            return result;
+            return await userManager_.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
     }
 }
