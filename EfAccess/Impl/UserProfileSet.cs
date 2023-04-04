@@ -5,11 +5,11 @@ using EfAccess.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfAccess.Impl;
-public class UserProfileDataSet : IUcSet<UserProfile>
+public class UserProfileSet : IUcSet<UserProfile>
 {
     private readonly EfDbContext context_;
 
-    public UserProfileDataSet(EfDbContext context)
+    public UserProfileSet(EfDbContext context)
     {
         context_ = context;
     }
@@ -24,13 +24,15 @@ public class UserProfileDataSet : IUcSet<UserProfile>
         return context_.UserProfiles.FirstOrDefaultAsync(predicate);
     }
 
-    public void Update(UserProfile entity)
+    public Task UpdateAsync(UserProfile entity)
     {
         context_.Update(entity);
+        return Task.CompletedTask;
     }
 
-    public void Remove(UserProfile entity)
+    public Task RemoveAsync(UserProfile entity)
     {
         context_.UserProfiles.Remove(entity);
+        return Task.CompletedTask;
     }
 }

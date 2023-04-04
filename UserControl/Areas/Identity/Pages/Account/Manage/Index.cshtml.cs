@@ -116,7 +116,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
                 userProfile.Picture = defaultProfile.Picture;
             }
 
-            context_.UserProfiles.Update(userProfile);
+            await context_.UserProfiles.UpdateAsync(userProfile);
             await context_.SaveChangesAsync();
 
             await signInManager_.RefreshSignInAsync(user);

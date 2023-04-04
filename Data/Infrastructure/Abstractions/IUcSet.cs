@@ -5,6 +5,6 @@ public interface IUcSet<TEntity> where TEntity : class
 {
     Task AddAsync(TEntity entity);
     Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
-    void Update(TEntity entity);
-    void Remove(TEntity entity);
+    Task UpdateAsync(TEntity entity);
+    Task RemoveAsync(TEntity entity);
 }

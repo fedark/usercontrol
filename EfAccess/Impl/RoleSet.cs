@@ -5,11 +5,11 @@ using EfAccess.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfAccess.Impl;
-public class RoleDataSet : IUcSet<Role>
+public class RoleSet : IUcSet<Role>
 {
     private readonly EfDbContext context_;
 
-    public RoleDataSet(EfDbContext context)
+    public RoleSet(EfDbContext context)
     {
         context_ = context;
     }
@@ -24,13 +24,15 @@ public class RoleDataSet : IUcSet<Role>
         return context_.Roles.FirstOrDefaultAsync(predicate);
     }
 
-    public void Update(Role entity)
+    public Task UpdateAsync(Role entity)
     {
         context_.Update(entity);
+        return Task.CompletedTask;
     }
 
-    public void Remove(Role entity)
+    public Task RemoveAsync(Role entity)
     {
         context_.Roles.Remove(entity);
+        return Task.CompletedTask;
     }
 }

@@ -7,9 +7,9 @@ public class EfUcContext : IUcContext
 {
     private readonly EfDbContext internalContext_;
 
-    public IUcSet<User> Users => new UserDataSet(internalContext_);
-    public IUcSet<Role> Roles => new RoleDataSet(internalContext_);
-    public IUcSet<UserProfile> UserProfiles => new UserProfileDataSet(internalContext_);
+    public IUcSet<User> Users => new UserSet(internalContext_);
+    public IUcSet<Role> Roles => new RoleSet(internalContext_);
+    public IUcSet<UserProfile> UserProfiles => new UserProfileSet(internalContext_);
 
     public EfUcContext(EfDbContext dbContext)
     {
