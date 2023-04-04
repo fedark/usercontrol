@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Ef.Infrastructure;
+namespace EfAccess.Infrastructure;
 
 public class EfDbContext : IdentityDbContext<User, Role, string>
 {

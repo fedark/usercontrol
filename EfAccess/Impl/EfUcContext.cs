@@ -1,8 +1,8 @@
 ﻿using Data.Infrastructure.Abstractions;
 using Data.Models;
-using Ef.Infrastructure;
+using EfAccess.Infrastructure;
 
-namespace Ef.Impl;
+namespace EfAccess.Impl;
 public class EfUcContext : IUcContext
 {
     private readonly EfDbContext internalContext_;

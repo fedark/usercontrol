@@ -11,13 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{13A05520-35F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{CA8251C9-41D9-4EF8-ACF6-1FF52B073405}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ef", "Ef\Ef.csproj", "{809A5C39-45BF-4173-8C09-737E6C9A0535}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfAccess", "EfAccess\EfAccess.csproj", "{809A5C39-45BF-4173-8C09-737E6C9A0535}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ef.PostgreSqlMigrations", "Ef.PostgreSqlMigrations\Ef.PostgreSqlMigrations.csproj", "{DF440B97-0D30-43E9-8EE5-92F3F4506C25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfAccess.PostgreSqlMigrations", "EfAccess.PostgreSqlMigrations\EfAccess.PostgreSqlMigrations.csproj", "{DF440B97-0D30-43E9-8EE5-92F3F4506C25}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ef.SqliteMigrations", "Ef.SqliteMigrations\Ef.SqliteMigrations.csproj", "{D417504C-FAA9-49EE-B15B-249D255AB1C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfAccess.SqliteMigrations", "EfAccess.SqliteMigrations\EfAccess.SqliteMigrations.csproj", "{D417504C-FAA9-49EE-B15B-249D255AB1C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ef.SqlServerMigrations", "Ef.SqlServerMigrations\Ef.SqlServerMigrations.csproj", "{AD325DA1-7642-4796-8A01-E0B4A9A44DF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfAccess.SqlServerMigrations", "EfAccess.SqlServerMigrations\EfAccess.SqlServerMigrations.csproj", "{AD325DA1-7642-4796-8A01-E0B4A9A44DF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

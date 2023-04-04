@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Ef.Infrastructure;
+namespace EfAccess.Infrastructure;
 public static class EfUcContextExtensions
 {
     public static IServiceCollection AddEfUcContext<TContext>(this IServiceCollection services,

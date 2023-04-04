@@ -22,10 +22,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Data\Data.csproj" />
-    <ProjectReference Include="..\Ef.PostgreSqlMigrations\Ef.PostgreSqlMigrations.csproj" />
-    <ProjectReference Include="..\Ef.SqliteMigrations\Ef.SqliteMigrations.csproj" />
-    <ProjectReference Include="..\Ef.SqlServerMigrations\Ef.SqlServerMigrations.csproj" />
-    <ProjectReference Include="..\Ef\Ef.csproj" />
+    <ProjectReference Include="..\EfAccess.PostgreSqlMigrations\EfAccess.PostgreSqlMigrations.csproj" />
+    <ProjectReference Include="..\EfAccess.SqliteMigrations\EfAccess.SqliteMigrations.csproj" />
+    <ProjectReference Include="..\EfAccess.SqlServerMigrations\EfAccess.SqlServerMigrations.csproj" />
+    <ProjectReference Include="..\EfAccess\EfAccess.csproj" />
   </ItemGroup>
 
 </Project>

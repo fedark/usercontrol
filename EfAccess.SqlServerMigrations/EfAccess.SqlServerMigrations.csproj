@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ef\Ef.csproj" />
+    <ProjectReference Include="..\EfAccess\EfAccess.csproj" />
   </ItemGroup>
 
 </Project>

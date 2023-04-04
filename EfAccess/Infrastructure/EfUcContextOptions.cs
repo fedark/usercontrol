@@ -1,6 +1,6 @@
 ﻿using Data.Infrastructure.Services;
 
-namespace Ef.Infrastructure;
+namespace EfAccess.Infrastructure;
 public class EfUcContextOptions
 {
     public EfDbProvider DbProvider { get; set; }

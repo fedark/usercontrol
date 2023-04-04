@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Data.Infrastructure.Abstractions;
 using Data.Models;
-using Ef.Infrastructure;
+using EfAccess.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ef.Impl;
+namespace EfAccess.Impl;
 public class RoleDataSet : IUcSet<Role>
 {
     private readonly EfDbContext context_;
