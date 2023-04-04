@@ -1,4 +1,4 @@
-﻿namespace Ef.Db;
+﻿namespace Ef.Infrastructure;
 
 public enum EfDbProvider
 {

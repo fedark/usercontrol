@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
 using Data.Infrastructure.Abstractions;
 using Data.Models;
-using Ef.Db;
+using Ef.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ef.Infrastructure;
-public class RoleDataSet : IDataSet<Role>
+namespace Ef.Impl;
+public class RoleDataSet : IUcSet<Role>
 {
     private readonly EfDbContext context_;
 

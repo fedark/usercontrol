@@ -1,11 +1,11 @@
 ﻿using Data.Models;
 
 namespace Data.Infrastructure.Abstractions;
-public interface IDataContext : IDisposable
+public interface IUcContext : IDisposable
 {
-    IDataSet<User> Users { get; }
-    IDataSet<Role> Roles { get; }
-    IDataSet<UserProfile> UserProfiles { get; }
+    IUcSet<User> Users { get; }
+    IUcSet<Role> Roles { get; }
+    IUcSet<UserProfile> UserProfiles { get; }
 
     void SaveChanges();
     Task SaveChangesAsync(CancellationToken cancellationToken = default);

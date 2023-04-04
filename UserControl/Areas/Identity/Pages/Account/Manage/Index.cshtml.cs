@@ -17,7 +17,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<User> userManager_;
         private readonly SignInManager<User> signInManager_;
-        private readonly IDataContext context_;
+        private readonly IUcContext context_;
         private readonly UserProfileProvider userProfileProvider_;
         private readonly IStringLocalizer<IndexModel> localizer_;
 
@@ -33,7 +33,7 @@ namespace UserControl.Areas.Identity.Pages.Account.Manage
         public IndexModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IDataContext context,
+            IUcContext context,
             UserProfileProvider userProfileProvider,
             IStringLocalizer<IndexModel> localizer)
         {

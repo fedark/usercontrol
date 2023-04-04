@@ -1,8 +1,7 @@
 using System.Globalization;
-using Data.Infrastructure.Abstractions;
 using Data.Infrastructure.Services;
 using Data.Models;
-using Ef.Db;
+using Ef.Impl;
 using Ef.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
@@ -15,7 +14,7 @@ using UserControl.ViewModels.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureDatabase(builder.Services, builder.Configuration);
+ConfigureDataContext(builder.Services, builder.Configuration);
 ConfigureIdentity(builder.Services, builder.Configuration);
 ConfigureMappings(builder.Services);
 
@@ -59,39 +58,29 @@ app.MapDefaultControllerRoute();
 
 app.Run();
 
-static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
+static void ConfigureDataContext(IServiceCollection services, IConfiguration configuration)
 {
     if (!Enum.TryParse<EfDbProvider>(configuration.GetValue("DbProvider", nameof(EfDbProvider.SqlServer)), out var provider))
     {
         provider = EfDbProvider.SqlServer;
     }
 
-    var connectionString = configuration.GetConnectionString("Default");
-
-    var dbOptionsAction = (DbContextOptionsBuilder dbOptions) =>
+    var connectionString = provider switch
     {
-        _ = provider switch
-        {
-            EfDbProvider.SqlServer => dbOptions.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlLocalDB"),
-                b => b.MigrationsAssembly("Data.SqlServerMigrations")),
-            EfDbProvider.PostgreSql => dbOptions.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlPostgreSqlDB"),
-                b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
-            EfDbProvider.Sqlite => dbOptions.UseSqlite(connectionString ??= configuration.GetConnectionString("UserControlSqliteDB"),
-                b => b.MigrationsAssembly("Data.SqliteMigrations")),
-            EfDbProvider.ContainerSqlServer => dbOptions.UseSqlServer(connectionString ??= configuration.GetConnectionString("UserControlContainerSqlServerDB"),
-                b => b.MigrationsAssembly("Data.SqlServerMigrations")),
-            EfDbProvider.ContainerPostgreSql => dbOptions.UseNpgsql(connectionString ??= configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
-                b => b.MigrationsAssembly("Data.PostgreSqlMigrations")),
-
-            _ => throw new Exception($"Database provider '{provider}' is not supported")
-        };
+        EfDbProvider.SqlServer => configuration.GetConnectionString("UserControlLocalDB"),
+        EfDbProvider.PostgreSql => configuration.GetConnectionString("UserControlPostgreSqlDB"),
+        EfDbProvider.Sqlite => configuration.GetConnectionString("UserControlSqliteDB"),
+        EfDbProvider.ContainerSqlServer => configuration.GetConnectionString("UserControlContainerSqlServerDB"),
+        EfDbProvider.ContainerPostgreSql => configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
+        _ => configuration.GetConnectionString("Default"),
     };
 
-    services.AddScoped<IDataContext, EfDataContext>();
-    services.AddDbContext<EfDbContext>(dbOptionsAction);
-
-    services.Configure<UserSeedOptions>(configuration.GetRequiredSection(nameof(UserSeedOptions)));
-    services.AddScoped<UserProfileProvider>();
+    services.AddEfUcContext<EfUcContext>(options =>
+    {
+        options.DbProvider = provider;
+        options.ConnectionString = connectionString ?? throw new Exception("Connection string is not provided");
+        options.SeedOptions = configuration.GetSection("IdentitySeedOptions").Get<IdentitySeedOptions>();
+    });
 }
 
 static void ConfigureIdentity(IServiceCollection services, IConfiguration configuration)
@@ -103,7 +92,7 @@ static void ConfigureIdentity(IServiceCollection services, IConfiguration config
         options.Password.RequireUppercase = false;
     })
         .AddRoles<Role>()
-        .AddEntityFrameworkStores<EfDbContext>()
+        .AddEfUcStores()
         .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
 
     services.Configure<LocalizationOptions>(configuration.GetRequiredSection("LocalizationOptions"));

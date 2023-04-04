@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
 using Data.Infrastructure.Abstractions;
 using Data.Models;
-using Ef.Db;
+using Ef.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ef.Infrastructure;
-public class UserProfileDataSet : IDataSet<UserProfile>
+namespace Ef.Impl;
+public class UserProfileDataSet : IUcSet<UserProfile>
 {
     private readonly EfDbContext context_;
 

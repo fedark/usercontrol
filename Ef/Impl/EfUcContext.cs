@@ -1,18 +1,17 @@
 ﻿using Data.Infrastructure.Abstractions;
-using Data.Infrastructure.Services;
 using Data.Models;
-using Ef.Db;
+using Ef.Infrastructure;
 
-namespace Ef.Infrastructure;
-public class EfDataContext : IDataContext
+namespace Ef.Impl;
+public class EfUcContext : IUcContext
 {
     private readonly EfDbContext internalContext_;
 
-    public IDataSet<User> Users => new UserDataSet(internalContext_);
-    public IDataSet<Role> Roles => new RoleDataSet(internalContext_);
-    public IDataSet<UserProfile> UserProfiles => new UserProfileDataSet(internalContext_);
+    public IUcSet<User> Users => new UserDataSet(internalContext_);
+    public IUcSet<Role> Roles => new RoleDataSet(internalContext_);
+    public IUcSet<UserProfile> UserProfiles => new UserProfileDataSet(internalContext_);
 
-    public EfDataContext(EfDbContext dbContext)
+    public EfUcContext(EfDbContext dbContext)
     {
         internalContext_ = dbContext;
     }

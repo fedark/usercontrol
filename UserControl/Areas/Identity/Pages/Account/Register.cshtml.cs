@@ -17,7 +17,7 @@ namespace UserControl.Areas.Identity.Pages.Account
         private readonly SignInManager<User> signInManager_;
         private readonly UserManager<User> userManager_;
         private readonly ILogger<RegisterModel> logger_;
-        private readonly IDataContext context_;
+        private readonly IUcContext context_;
         private readonly UserProfileProvider userProfileProvider_;
 
         [BindProperty]
@@ -31,7 +31,7 @@ namespace UserControl.Areas.Identity.Pages.Account
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IDataContext context,
+            IUcContext context,
             UserProfileProvider userProfileProvider)
         {
             userManager_ = userManager;

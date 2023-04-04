@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Ef.Db;
+namespace Ef.Infrastructure;
 
 public class EfDbContext : IdentityDbContext<User, Role, string>
 {
     public DbSet<UserProfile> UserProfiles { get; set; } = default!;
 
-    private readonly UserSeedOptions seedOptions_;
+    private readonly IdentitySeedOptions seedOptions_;
     private readonly UserProfileProvider userProfileProvider_;
 
-    public EfDbContext(DbContextOptions options, IOptions<UserSeedOptions> seedOptions, UserProfileProvider userProfileProvider) : base(options)
+    public EfDbContext(DbContextOptions options, IOptions<IdentitySeedOptions> seedOptions, UserProfileProvider userProfileProvider) : base(options)
     {
         seedOptions_ = seedOptions.Value;
         userProfileProvider_ = userProfileProvider;
