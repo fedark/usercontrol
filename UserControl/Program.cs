@@ -65,20 +65,20 @@ static void ConfigureDataContext(IServiceCollection services, IConfiguration con
         provider = EfDbProvider.SqlServer;
     }
 
-    var connectionString = provider switch
+    var connectionString = configuration.GetConnectionString("Default") ?? provider switch
     {
         EfDbProvider.SqlServer => configuration.GetConnectionString("UserControlLocalDB"),
         EfDbProvider.PostgreSql => configuration.GetConnectionString("UserControlPostgreSqlDB"),
         EfDbProvider.Sqlite => configuration.GetConnectionString("UserControlSqliteDB"),
         EfDbProvider.ContainerSqlServer => configuration.GetConnectionString("UserControlContainerSqlServerDB"),
         EfDbProvider.ContainerPostgreSql => configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
-        _ => configuration.GetConnectionString("Default"),
-    };
+        _ => throw new Exception("Connection string is not provided")
+    } ?? throw new Exception("Connection string is not provided");
 
     services.AddEfUcContext<EfUcContext>(options =>
     {
         options.DbProvider = provider;
-        options.ConnectionString = connectionString ?? throw new Exception("Connection string is not provided");
+        options.ConnectionString = connectionString;
         options.SeedOptions = configuration.GetSection("IdentitySeedOptions").Get<IdentitySeedOptions>();
     });
 }

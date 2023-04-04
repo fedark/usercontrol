@@ -3,9 +3,10 @@ WORKDIR /usercontrol
 
 COPY ./UserControl/*.csproj ./UserControl/
 COPY ./Data/*.csproj ./Data/
-COPY ./Data.SqlServerMigrations/*.csproj ./Data.SqlServerMigrations/
-COPY ./Data.PostgreSqlMigrations/*.csproj ./Data.PostgreSqlMigrations/
-COPY ./Data.SqliteMigrations/*.csproj ./Data.SqliteMigrations/
+COPY ./EfAccess/*.csproj ./EfAccess/
+COPY ./EfAccess.SqlServerMigrations/*.csproj ./EfAccess.SqlServerMigrations/
+COPY ./EfAccess.PostgreSqlMigrations/*.csproj ./EfAccess.PostgreSqlMigrations/
+COPY ./EfAccess.SqliteMigrations/*.csproj ./EfAccess.SqliteMigrations/
 RUN dotnet restore ./UserControl/UserControl.csproj
 
 COPY . ./

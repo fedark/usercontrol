@@ -29,11 +29,11 @@ public static class EfUcContextExtensions
         {
             _ = provider switch
             {
-                EfDbProvider.SqlServer => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Ef.SqlServerMigrations")),
-                EfDbProvider.PostgreSql => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Ef.PostgreSqlMigrations")),
-                EfDbProvider.Sqlite => options.UseSqlite(connectionString, b => b.MigrationsAssembly("Ef.SqliteMigrations")),
-                EfDbProvider.ContainerSqlServer => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Ef.SqlServerMigrations")),
-                EfDbProvider.ContainerPostgreSql => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Ef.PostgreSqlMigrations")),
+                EfDbProvider.SqlServer => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EfAccess.SqlServerMigrations")),
+                EfDbProvider.PostgreSql => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("EfAccess.PostgreSqlMigrations")),
+                EfDbProvider.Sqlite => options.UseSqlite(connectionString, b => b.MigrationsAssembly("EfAccess.SqliteMigrations")),
+                EfDbProvider.ContainerSqlServer => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("EfAccess.SqlServerMigrations")),
+                EfDbProvider.ContainerPostgreSql => options.UseNpgsql(connectionString, b => b.MigrationsAssembly("EfAccess.PostgreSqlMigrations")),
 
                 _ => throw new Exception($"Database provider '{provider}' is not supported")
             };
