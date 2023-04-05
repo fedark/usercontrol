@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfAccess.SqliteMigrations",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfAccess.SqlServerMigrations", "EfAccess.SqlServerMigrations\EfAccess.SqlServerMigrations.csproj", "{AD325DA1-7642-4796-8A01-E0B4A9A44DF3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoAccess", "MongoAccess\MongoAccess.csproj", "{5BA48704-92A6-46C6-AD30-6EC630555386}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{AD325DA1-7642-4796-8A01-E0B4A9A44DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD325DA1-7642-4796-8A01-E0B4A9A44DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD325DA1-7642-4796-8A01-E0B4A9A44DF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BA48704-92A6-46C6-AD30-6EC630555386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BA48704-92A6-46C6-AD30-6EC630555386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BA48704-92A6-46C6-AD30-6EC630555386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BA48704-92A6-46C6-AD30-6EC630555386}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{DF440B97-0D30-43E9-8EE5-92F3F4506C25} = {48DBBA07-887E-40BB-81F6-04F1C5C2CED7}
 		{D417504C-FAA9-49EE-B15B-249D255AB1C1} = {48DBBA07-887E-40BB-81F6-04F1C5C2CED7}
 		{AD325DA1-7642-4796-8A01-E0B4A9A44DF3} = {48DBBA07-887E-40BB-81F6-04F1C5C2CED7}
+		{5BA48704-92A6-46C6-AD30-6EC630555386} = {48DBBA07-887E-40BB-81F6-04F1C5C2CED7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {69DDB361-4591-499A-BFF7-F0ABE0550059}
