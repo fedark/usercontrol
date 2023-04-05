@@ -21,11 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DapperAccess\DapperAccess.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\EfAccess.PostgreSqlMigrations\EfAccess.PostgreSqlMigrations.csproj" />
     <ProjectReference Include="..\EfAccess.SqliteMigrations\EfAccess.SqliteMigrations.csproj" />
     <ProjectReference Include="..\EfAccess.SqlServerMigrations\EfAccess.SqlServerMigrations.csproj" />
     <ProjectReference Include="..\EfAccess\EfAccess.csproj" />
+    <ProjectReference Include="..\MongoAccess\MongoAccess.csproj" />
   </ItemGroup>
 
 </Project>

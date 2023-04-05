@@ -1,4 +1,6 @@
 using System.Globalization;
+using DapperAccess.Impl;
+using DapperAccess.Infrastructure;
 using Data.Infrastructure.Services;
 using Data.Models;
 using EfAccess.Impl;
@@ -7,6 +9,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MongoAccess.Impl;
+using MongoAccess.Infrastructure;
+using UserControl;
 using UserControl.Access;
 using UserControl.Localization;
 using UserControl.Services;
@@ -60,27 +65,56 @@ app.Run();
 
 static void ConfigureDataContext(IServiceCollection services, IConfiguration configuration)
 {
-    if (!Enum.TryParse<EfDbProvider>(configuration.GetValue("DbProvider", nameof(EfDbProvider.SqlServer)), out var provider))
+    if (!Enum.TryParse<DataAccessProvider>(configuration.GetValue(nameof(DataAccessProvider), nameof(DataAccessProvider.EfSqlServer)), out var provider))
     {
-        provider = EfDbProvider.SqlServer;
+        provider = DataAccessProvider.EfSqlServer;
     }
 
     var connectionString = configuration.GetConnectionString("Default") ?? provider switch
     {
-        EfDbProvider.SqlServer => configuration.GetConnectionString("UserControlLocalDB"),
-        EfDbProvider.PostgreSql => configuration.GetConnectionString("UserControlPostgreSqlDB"),
-        EfDbProvider.Sqlite => configuration.GetConnectionString("UserControlSqliteDB"),
-        EfDbProvider.ContainerSqlServer => configuration.GetConnectionString("UserControlContainerSqlServerDB"),
-        EfDbProvider.ContainerPostgreSql => configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
+        DataAccessProvider.EfSqlServer => configuration.GetConnectionString("UserControlLocalDB"),
+        DataAccessProvider.EfPostgreSql => configuration.GetConnectionString("UserControlPostgreSqlDB"),
+        DataAccessProvider.EfSqlite => configuration.GetConnectionString("UserControlSqliteDB"),
+        DataAccessProvider.EfContainerSqlServer => configuration.GetConnectionString("UserControlContainerSqlServerDB"),
+        DataAccessProvider.EfContainerPostgreSql => configuration.GetConnectionString("UserControlContainerPostgreSqlDB"),
+        DataAccessProvider.MongoDb => configuration.GetConnectionString("UserControlMongoDB"),
+        DataAccessProvider.Dapper => configuration.GetConnectionString("UserControlLocalDB"),
         _ => throw new Exception("Connection string is not provided")
     } ?? throw new Exception("Connection string is not provided");
 
-    services.AddEfUcContext<EfUcContext>(options =>
+    var efProvider = provider switch
     {
-        options.DbProvider = provider;
-        options.ConnectionString = connectionString;
-        options.SeedOptions = configuration.GetSection("IdentitySeedOptions").Get<IdentitySeedOptions>();
-    });
+        DataAccessProvider.EfSqlServer => EfDbProvider.SqlServer,
+        DataAccessProvider.EfPostgreSql => EfDbProvider.PostgreSql,
+        DataAccessProvider.EfSqlite => EfDbProvider.Sqlite,
+        DataAccessProvider.EfContainerSqlServer => EfDbProvider.ContainerSqlServer,
+        DataAccessProvider.EfContainerPostgreSql => EfDbProvider.ContainerPostgreSql,
+        _ => (EfDbProvider?)null
+    };
+
+    _ = provider switch
+    {
+        DataAccessProvider.EfSqlServer or
+        DataAccessProvider.EfPostgreSql or
+        DataAccessProvider.EfSqlite or
+        DataAccessProvider.EfContainerSqlServer or
+        DataAccessProvider.EfContainerPostgreSql => services.AddEfUcContext<EfUcContext>(options =>
+        {
+            options.DbProvider = efProvider ?? throw new Exception("Database provider is not set");
+            options.ConnectionString = connectionString;
+            options.SeedOptions = configuration.GetSection("IdentitySeedOptions").Get<IdentitySeedOptions>();
+        }),
+        DataAccessProvider.MongoDb => services.AddMongoUcContext<MongoUcContext>(options =>
+        {
+            options.ConnectionString = connectionString;
+            options.DatabaseName = "UserControl";
+        }),
+        DataAccessProvider.Dapper => services.AddDapperUcContext<DapperUcContext>(options =>
+        {
+            options.ConnectionString = connectionString;
+        }),
+        _ => throw new Exception("Database provider is not set")
+    };
 }
 
 static void ConfigureIdentity(IServiceCollection services, IConfiguration configuration)

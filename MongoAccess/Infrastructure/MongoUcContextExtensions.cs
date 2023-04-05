@@ -16,7 +16,7 @@ public static class MongoUcContextExtensions
         optionsAction(options);
 
         services.AddSingleton(new MongoClient(options.ConnectionString).GetDatabase(options.DatabaseName));
-        services.TryAddSingleton(typeof(IUcContext), typeof(TContext));
+        services.TryAddScoped(typeof(IUcContext), typeof(TContext));
         return services;
     }
 
